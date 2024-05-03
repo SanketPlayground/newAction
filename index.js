@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-var fetch = require('node-fetch');
+var axios = require('axios')
 try {
   // `who-to-greet` input defined in action metadata file
   const nameToGreet = core.getInput('who-to-greet');
@@ -19,34 +19,20 @@ try {
     var organization = core.getInput('organization');
     var accessToken = core.getInput('token');
     
-    function fetchRepositories() {
-      try {
-        fetch(`https://api.github.com/orgs/${organization}/repos`, {
-          headers: {
-            Authorization: `token ${accessToken}`,
-          },
-        })
-        .then(function(response) {
-          if (!response.ok) {
-            throw new Error(`Failed to fetch repositories: ${response.status} ${response.statusText}`);
-          }
-          return response.json();
-        })
-        .then(function(repositories) {
-          console.log("Repositories in the organization:");
-          repositories.forEach(function(repo) {
-            console.log(repo);
-          });
-        })
-        .catch(function(error) {
-          console.error('Error:', error.message);
-        });
-      } catch (error) {
-        core.setFailed(error.message);
-      }
-    }
-    
-    fetchRepositories();
+    axios.get(`https://api.github.com/orgs/${organization}/repos`, {
+      headers: {
+        Authorization: `token ${accessToken}`,
+      },
+    })
+    .then(function(response) {
+      console.log("Repositories in the organization:");
+      response.data.forEach(function(repo) {
+        console.log(repo);
+      });
+    })
+    .catch(function(error) {
+      console.error('Error:', error.message);
+    });
     
 } catch (error) {
   core.setFailed(error.message);
