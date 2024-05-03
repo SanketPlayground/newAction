@@ -37808,7 +37808,7 @@ try {
     .then(function(response) {
       console.log("Repositories in the organization:");
       response.data.forEach(function(repo) {
-        console.log(repo);
+        console.log(repo.name);
       });
     })
     .catch(function(error) {
