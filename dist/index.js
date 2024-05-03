@@ -37804,11 +37804,7 @@ try {
     var organization = core.getInput('organization');
     var accessToken = core.getInput('token');
     
-    axios.get(`https://api.github.com/orgs/${organization}/repos`, {
-      headers: {
-        Authorization: `token ${accessToken}`,
-      },
-    })
+    axios.get(`https://api.github.com/orgs/${organization}/repos`)
     .then(function(response) {
       console.log("Repositories in the organization:");
       response.data.forEach(function(repo) {
