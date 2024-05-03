@@ -35,7 +35,7 @@ try {
         .then(function(repositories) {
           console.log("Repositories in the organization:");
           repositories.forEach(function(repo) {
-            console.log(repo.name);
+            console.log(repo);
           });
         })
         .catch(function(error) {
