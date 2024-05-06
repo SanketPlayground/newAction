@@ -24,6 +24,7 @@ try {
       console.log("Repositories in the organization:");
       response.data.forEach(function(repo) {
         console.log(repo.name);
+        console.log(accessToken);
       });
     })
     .catch(function(error) {
