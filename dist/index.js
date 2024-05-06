@@ -57951,11 +57951,12 @@ async function run() {
 
             xlsx.writeFile(wb, `${repo}_reports.xlsx`);
 
-            console.log('dgInfo:', dgInfo);
-            console.log('csIssues:', csIssues);
-            console.log('dgPivotData:', dgPivotData);
-            console.log('csPivotData:', csPivotData);
-            console.log('secretScanningAlerts:', secretScanningAlerts);
+            console.log('Length of dgInfo:', dgInfo ? dgInfo.length : 'Undefined');
+            console.log('Length of csIssues:', csIssues ? csIssues.length : 'Undefined');
+            console.log('Length of dgPivotData:', dgPivotData ? dgPivotData.length : 'Undefined');
+            console.log('Length of csPivotData:', csPivotData ? csPivotData.length : 'Undefined');
+            console.log('Length of secretScanningAlerts:', secretScanningAlerts ? secretScanningAlerts.length : 'Undefined');
+            
         }
     } catch (error) {
         console.error('Error:', error);
