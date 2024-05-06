@@ -245,10 +245,11 @@ async function run() {
             const secretScanningAlerts = await getSecretScanningReport(org, repo, octokit);
 
             let dgPivotData = [];
+            let csPivotData = [];
 
 
             dgPivotData = generatePivot(['packageName'], ['packageManager'], 'requirements', 'count', dgInfo);
-            const csPivotData = generatePivot(['ruleId'], ['ruleSeverity'], 'file', 'count', csIssues);
+            csPivotData = generatePivot(['ruleId'], ['ruleSeverity'], 'file', 'count', csIssues);
 
             const wb = xlsx.utils.book_new();
             const ws1 = xlsx.utils.aoa_to_sheet(dgInfo);
