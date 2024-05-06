@@ -245,11 +245,6 @@ async function run() {
             const secretScanningAlerts = await getSecretScanningReport(org, repo, octokit);
 
             let dgPivotData = [];
-            console.log('dgInfo:', dgInfo);
-console.log('csIssues:', csIssues);
-console.log('dgPivotData:', dgPivotData);
-console.log('csPivotData:', csPivotData);
-console.log('secretScanningAlerts:', secretScanningAlerts);
 
 
             dgPivotData = generatePivot(['packageName'], ['packageManager'], 'requirements', 'count', dgInfo);
@@ -269,6 +264,12 @@ console.log('secretScanningAlerts:', secretScanningAlerts);
             xlsx.utils.book_append_sheet(wb, ws5, 'secret-scanning-alerts');
 
             xlsx.writeFile(wb, `${repo}_reports.xlsx`);
+
+            console.log('dgInfo:', dgInfo);
+            console.log('csIssues:', csIssues);
+            console.log('dgPivotData:', dgPivotData);
+            console.log('csPivotData:', csPivotData);
+            console.log('secretScanningAlerts:', secretScanningAlerts);
         }
     } catch (error) {
         console.error('Error:', error);
