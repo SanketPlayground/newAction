@@ -249,9 +249,10 @@ console.log('csIssues:', csIssues);
 console.log('dgPivotData:', dgPivotData);
 console.log('csPivotData:', csPivotData);
 console.log('secretScanningAlerts:', secretScanningAlerts);
+let dgPivotData = [];
 
 
-            const dgPivotData = generatePivot(['packageName'], ['packageManager'], 'requirements', 'count', dgInfo);
+            dgPivotData = generatePivot(['packageName'], ['packageManager'], 'requirements', 'count', dgInfo);
             const csPivotData = generatePivot(['ruleId'], ['ruleSeverity'], 'file', 'count', csIssues);
 
             const wb = xlsx.utils.book_new();
