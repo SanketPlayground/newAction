@@ -57929,6 +57929,13 @@ async function run() {
             const dgInfo = await getDependencyGraphReport(org, repo, token);
             const secretScanningAlerts = await getSecretScanningReport(org, repo, octokit);
 
+            console.log('dgInfo:', dgInfo);
+console.log('csIssues:', csIssues);
+console.log('dgPivotData:', dgPivotData);
+console.log('csPivotData:', csPivotData);
+console.log('secretScanningAlerts:', secretScanningAlerts);
+
+
             const dgPivotData = generatePivot(['packageName'], ['packageManager'], 'requirements', 'count', dgInfo);
             const csPivotData = generatePivot(['ruleId'], ['ruleSeverity'], 'file', 'count', csIssues);
 
