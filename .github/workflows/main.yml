@@ -16,7 +16,6 @@ jobs:
           who-to-greet: 'Sanket Desai'
           token: ${{secrets.ACCESS_TOKEN}}
         env:
-          repo: ${{secrets.repo}}
           organization: ${{secrets.ORG}}
       # Use the output from the `hello` step
       - name: Get the output time
