@@ -10,6 +10,9 @@ inputs:
     default: 'SanketPlayground'
   token:
     required: true 
+  repo:
+    required: true 
+    default: ${{ github.repository }}
 outputs:
   time: # id of output
     description: 'The time we greeted you'
