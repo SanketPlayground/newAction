@@ -45,19 +45,15 @@ async function getSecretScanningAlerts(org, repo, token) {
 }
 
 async function generateExcel(data, org, repo) {
-    const outputDir = path.join(__dirname, 'output'); // Specify the output directory
-    if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir);
-    }
-
     const wb = xlsx.utils.book_new();
     const ws = xlsx.utils.aoa_to_sheet(data);
     const sheetName = `${repo.substring(0, 30)}-secret-scanning-alerts`;
     xlsx.utils.book_append_sheet(wb, ws, sheetName);
-    const outputPath = path.join(outputDir, `${repo}-alerts.xlsx`); // Specify output file path within the output directory
+    const outputPath = path.join(process.env.GITHUB_WORKSPACE, `${repo}-alerts.xlsx`); // Save in GitHub workspace directory
     xlsx.writeFile(wb, outputPath);
     return outputPath;
 }
+
 
 
 
