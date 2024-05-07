@@ -1,23 +1,29 @@
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
-const { Octokit } = require('@octokit/rest');
 const xlsx = require('xlsx');
 const core = require('@actions/core');
 
 async function getAllRepos(org, token) {
-  const octokit = new Octokit({ auth: token });
-  const response = await octokit.repos.listForOrg({ org });
-  return response.data.map(repo => repo.name);
+  const url = `https://api.github.com/orgs/${org}/repos`;
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `token ${token}`
+    }
+  });
+  const data = await response.json();
+  return data.map(repo => repo.name);
 }
 
 async function getSecretScanningAlerts(org, repo, token) {
-  const octokit = new Octokit({ auth: token });
-  const response = await octokit.paginate(octokit.rest.secretScanning.listAlertsForRepo, {
-    owner: org,
-    repo
+  const url = `https://api.github.com/repos/${org}/${repo}/secret-scanning/alerts`;
+  const response = await fetch(url, {
+    headers: {
+      Authorization: `token ${token}`
+    }
   });
-  return response.map(alert => [
+  const data = await response.json();
+  return data.map(alert => [
     alert.html_url || '',
     alert.secret_type || '',
     alert.secret || '',
