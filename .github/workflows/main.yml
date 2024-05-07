@@ -23,19 +23,12 @@ jobs:
       - name: Generate Excel
         id: generate-excel
         run: |
-          # Call the generateExcel function here
+          node -e "require('./path/to/your/index.js').generateExcel()"
         continue-on-error: true # Allow workflow to continue even if this step fails
+      
       
       - name: Upload artifact
         uses: actions/upload-artifact@v3.0.0
         with:
           name: generated-alerts
           path: ${{ steps.generate-excel.outputs.excel-path }}
-      
-      
-      
-      
-      
-      
-        
-      
