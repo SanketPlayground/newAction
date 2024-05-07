@@ -96504,30 +96504,19 @@ async function getSecretScanningAlerts(org, repo, token) {
 }
 
 async function generateExcel(data, org, repo) {
-    // Specify the output directory
-    const outputDir = path.join(__dirname, 'output');
-
-    // Create the output directory if it doesn't exist
+    const outputDir = path.join(__dirname, 'output'); // Specify the output directory
     if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir);
     }
 
-    // Specify the output file path within the output directory
-    const outputPath = path.join(outputDir, `${repo}-alerts.xlsx`);
-
-    // Create the Excel workbook
     const wb = xlsx.utils.book_new();
     const ws = xlsx.utils.aoa_to_sheet(data);
     const sheetName = `${repo.substring(0, 30)}-secret-scanning-alerts`;
     xlsx.utils.book_append_sheet(wb, ws, sheetName);
-
-    // Write the workbook to the output file
+    const outputPath = path.join(outputDir, `${repo}-alerts.xlsx`); // Specify output file path within the output directory
     xlsx.writeFile(wb, outputPath);
-
-    // Return the path of the generated Excel file
     return outputPath;
 }
-
 
 
 
