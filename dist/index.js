@@ -1,472 +1,6 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 5763:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-var core = __nccwpck_require__(115);
-var xlsx = __nccwpck_require__(6725);
-var rest_1 = __nccwpck_require__(4273);
-var quick_pivot_1 = __nccwpck_require__(5736);
-var graphql_1 = __nccwpck_require__(9126);
-function generateSecurityReportForRepo(repo, token) {
-    return __awaiter(this, void 0, void 0, function () {
-        var octokit, login, repoName, dgIssues, csIssues, dgInfo, secretScanningAlerts, dgPivotData, csPivotData, wb, ws, ws1, ws2, ws3, ws4, ws5, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 5, , 6]);
-                    if (!token) {
-                        core.error('Please set the INPUT_TOKEN env variable');
-                        return [2 /*return*/];
-                    }
-                    octokit = new rest_1.Octokit({ auth: token });
-                    login = '';
-                    repoName = '';
-                    if (repo) {
-                        login = repo.split('/')[0];
-                        repoName = repo.split('/')[1];
-                    }
-                    else {
-                        core.error('Could not find repo, please set the GITHUB_REPOSITORY env variable');
-                        return [2 /*return*/];
-                    }
-                    return [4 /*yield*/, getDependabotReport(login, repoName, token)];
-                case 1:
-                    dgIssues = _a.sent();
-                    return [4 /*yield*/, getCodeScanningReport(login, repoName, octokit)];
-                case 2:
-                    csIssues = _a.sent();
-                    return [4 /*yield*/, getDependencyGraphReport(login, repoName, token)];
-                case 3:
-                    dgInfo = _a.sent();
-                    return [4 /*yield*/, getSecretScanningReport(octokit, login, repoName)];
-                case 4:
-                    secretScanningAlerts = _a.sent();
-                    dgPivotData = generatePivot(['manifest'], ['licenseInfo'], 'packageName', 'count', dgInfo);
-                    csPivotData = generatePivot(['cwe'], ['severity'], 'html_url', 'count', csIssues);
-                    wb = xlsx.utils.book_new();
-                    ws = xlsx.utils.aoa_to_sheet(csIssues);
-                    ws1 = xlsx.utils.aoa_to_sheet(dgInfo);
-                    ws2 = xlsx.utils.aoa_to_sheet(dgPivotData);
-                    ws3 = xlsx.utils.aoa_to_sheet(csPivotData);
-                    ws4 = xlsx.utils.aoa_to_sheet(secretScanningAlerts);
-                    ws5 = xlsx.utils.aoa_to_sheet(dgIssues);
-                    xlsx.utils.book_append_sheet(wb, ws, 'code-scanning-issues');
-                    xlsx.utils.book_append_sheet(wb, ws1, 'dependencies-list');
-                    xlsx.utils.book_append_sheet(wb, ws2, 'dependencies-license-pivot');
-                    xlsx.utils.book_append_sheet(wb, ws3, 'code-scanning-Pivot');
-                    xlsx.utils.book_append_sheet(wb, ws4, 'secret-scanning-alerts');
-                    xlsx.utils.book_append_sheet(wb, ws5, 'software-composition-analysis');
-                    xlsx.writeFile(wb, "".concat(repo.replace('/', '-'), "-alerts.xlsx"));
-                    return [3 /*break*/, 6];
-                case 5:
-                    error_1 = _a.sent();
-                    if (error_1 instanceof Error)
-                        core.setFailed(error_1.message);
-                    return [3 /*break*/, 6];
-                case 6: return [2 /*return*/];
-            }
-        });
-    });
-}
-function getSecretScanningReport(octokit, login, repoName) {
-    return __awaiter(this, void 0, void 0, function () {
-        var csvData, secretScanningAlerts, header, _i, secretScanningAlerts_1, alert_1, row, error_2;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    csvData = [];
-                    return [4 /*yield*/, octokit.paginate(octokit.rest.secretScanning.listAlertsForRepo, {
-                            owner: login,
-                            repo: repoName
-                        })];
-                case 1:
-                    secretScanningAlerts = _a.sent();
-                    header = [
-                        'html_url',
-                        'secret_type',
-                        'secret',
-                        'state',
-                        'resolution'
-                    ];
-                    csvData.push(header);
-                    for (_i = 0, secretScanningAlerts_1 = secretScanningAlerts; _i < secretScanningAlerts_1.length; _i++) {
-                        alert_1 = secretScanningAlerts_1[_i];
-                        row = [
-                            alert_1.html_url,
-                            alert_1.secret_type,
-                            alert_1.secret,
-                            alert_1.state,
-                            alert_1.resolution
-                        ];
-                        csvData.push(row);
-                    }
-                    return [2 /*return*/, csvData];
-                case 2:
-                    error_2 = _a.sent();
-                    if (error_2 instanceof Error) {
-                        core.error(error_2.message);
-                        return [2 /*return*/, [[error_2.message, '', '', '', '']]];
-                    }
-                    return [2 /*return*/, [[]]];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function generatePivot(rowHeader, colHeader, aggregationHeader, aggregator, dgInfo) {
-    var aggregationDimensions = ["".concat(aggregationHeader)];
-    var pivot = new quick_pivot_1.default(dgInfo, rowHeader, colHeader, aggregationDimensions, aggregator);
-    var pivotData = [];
-    for (var _i = 0, _a = pivot.data.table; _i < _a.length; _i++) {
-        var row = _a[_i];
-        var pivotRow = [];
-        for (var _b = 0, _c = row.value; _b < _c.length; _b++) {
-            var col = _c[_b];
-            pivotRow.push(col);
-        }
-        pivotData.push(pivotRow);
-    }
-    return pivotData;
-}
-function getCodeScanningReport(login, repoName, octokit) {
-    return __awaiter(this, void 0, void 0, function () {
-        var data, csvData, header, _i, data_1, alert_2, rule, securitySeverity, securityCwe, _a, _b, cwe, _alert, row, error_3;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    _c.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, octokit.paginate(octokit.rest.codeScanning.listAlertsForRepo, {
-                            owner: login,
-                            repo: repoName
-                        })];
-                case 1:
-                    data = _c.sent();
-                    csvData = [];
-                    header = [
-                        'toolName',
-                        'toolVersion',
-                        'alertNumber',
-                        'htmlUrl',
-                        'state',
-                        'rule',
-                        'cwe',
-                        'severity',
-                        'location',
-                        'start-line',
-                        'end-line',
-                        'createdAt',
-                        'updatedAt',
-                        'fixedAt',
-                        'dismissedAt',
-                        'dismissedBy'
-                    ];
-                    csvData.push(header);
-                    for (_i = 0, data_1 = data; _i < data_1.length; _i++) {
-                        alert_2 = data_1[_i];
-                        rule = alert_2.rule;
-                        securitySeverity = '';
-                        securityCwe = '';
-                        if (rule.security_severity_level) {
-                            securitySeverity = rule.security_severity_level;
-                        }
-                        else {
-                            securitySeverity = rule.severity;
-                        }
-                        for (_a = 0, _b = rule.tags; _a < _b.length; _a++) {
-                            cwe = _b[_a];
-                            if (cwe.includes('external/cwe/cwe')) {
-                                securityCwe = "".concat(securityCwe).concat(cwe, ", ");
-                            }
-                        }
-                        securityCwe = securityCwe.replace(/,\s*$/, '');
-                        _alert = alert_2;
-                        row = [
-                            alert_2.tool.name,
-                            alert_2.tool.version,
-                            alert_2.number.toString(),
-                            alert_2.html_url,
-                            alert_2.state,
-                            rule.id,
-                            securityCwe,
-                            securitySeverity,
-                            alert_2.most_recent_instance.location.path,
-                            alert_2.most_recent_instance.location.start_line,
-                            alert_2.most_recent_instance.location.end_line,
-                            alert_2.created_at,
-                            _alert.updated_at,
-                            _alert.fixed_at,
-                            alert_2.dismissed_at,
-                            alert_2.dismissed_by
-                        ];
-                        csvData.push(row);
-                    }
-                    return [2 /*return*/, csvData];
-                case 2:
-                    error_3 = _c.sent();
-                    if (error_3 instanceof Error) {
-                        core.error(error_3.message);
-                        return [2 /*return*/, [[error_3.message]]];
-                    }
-                    return [2 /*return*/, [[]]];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function getDependencyGraphReport(login, repoName, token) {
-    return __awaiter(this, void 0, void 0, function () {
-        var response, csvData, header, _i, _a, dependency, _b, _c, dependencyEdge, licenseInfo, row, error_4;
-        return __generator(this, function (_d) {
-            switch (_d.label) {
-                case 0:
-                    _d.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, (0, graphql_1.graphql)("\n      {\n        repository(owner: \"".concat(login, "\", name: \"").concat(repoName, "\") {\n          name\n          licenseInfo {\n            name\n          }\n          dependencyGraphManifests {\n            totalCount\n            edges {\n              node {\n                filename\n                dependencies {\n                  edges {\n                    node {\n                      packageName\n                      packageManager\n                      requirements\n                      repository {\n                        licenseInfo {\n                          name\n                        }\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    "), {
-                            headers: {
-                                authorization: "token ".concat(token),
-                                accept: 'application/vnd.github.hawkgirl-preview+json'
-                            }
-                        })];
-                case 1:
-                    response = _d.sent();
-                    csvData = [];
-                    header = [
-                        'manifest',
-                        'packageName',
-                        'packageManager',
-                        'requirements',
-                        'licenseInfo'
-                    ];
-                    csvData.push(header);
-                    for (_i = 0, _a = response.repository.dependencyGraphManifests.edges; _i < _a.length; _i++) {
-                        dependency = _a[_i];
-                        for (_b = 0, _c = dependency.node.dependencies.edges; _b < _c.length; _b++) {
-                            dependencyEdge = _c[_b];
-                            licenseInfo = '';
-                            if (dependencyEdge.node &&
-                                dependencyEdge.node.repository &&
-                                dependencyEdge.node.repository.licenseInfo) {
-                                licenseInfo = dependencyEdge.node.repository.licenseInfo.name;
-                            }
-                            row = [
-                                dependency.node.filename,
-                                dependencyEdge.node.packageName,
-                                dependencyEdge.node.packageManager,
-                                dependencyEdge.node.requirements,
-                                licenseInfo
-                            ];
-                            csvData.push(row);
-                        }
-                    }
-                    return [2 /*return*/, csvData];
-                case 2:
-                    error_4 = _d.sent();
-                    if (error_4 instanceof Error) {
-                        core.error(error_4.message);
-                        return [2 /*return*/, [[error_4.message]]];
-                    }
-                    return [2 /*return*/, [[]]];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function getDependabotReport(login, repoName, token) {
-    return __awaiter(this, void 0, void 0, function () {
-        var csvData, header, response, after, _i, _a, dependency, version, row, error_5;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    _b.trys.push([0, 5, , 6]);
-                    csvData = [];
-                    header = [
-                        'ghsaId',
-                        'packageName',
-                        'packageManager',
-                        'severity',
-                        'firstPatchedVersion',
-                        'description'
-                    ];
-                    csvData.push(header);
-                    response = void 0;
-                    after = '';
-                    _b.label = 1;
-                case 1: return [4 /*yield*/, fetchAPIResults(login, repoName, after, token)];
-                case 2:
-                    response = _b.sent();
-                    after = response.repository.vulnerabilityAlerts.pageInfo.endCursor;
-                    for (_i = 0, _a = response.repository.vulnerabilityAlerts.nodes; _i < _a.length; _i++) {
-                        dependency = _a[_i];
-                        version = 'na';
-                        if (dependency.securityVulnerability.firstPatchedVersion != null)
-                            version =
-                                dependency.securityVulnerability.firstPatchedVersion.identifier;
-                        row = [
-                            dependency.securityVulnerability.advisory.ghsaId,
-                            dependency.securityVulnerability.package.name,
-                            dependency.securityVulnerability.package.ecosystem,
-                            dependency.securityVulnerability.advisory.severity,
-                            version,
-                            dependency.securityVulnerability.advisory.description
-                        ];
-                        csvData.push(row);
-                    }
-                    _b.label = 3;
-                case 3:
-                    if (response.repository.vulnerabilityAlerts.pageInfo.hasNextPage) return [3 /*break*/, 1];
-                    _b.label = 4;
-                case 4: return [2 /*return*/, csvData];
-                case 5:
-                    error_5 = _b.sent();
-                    if (error_5 instanceof Error) {
-                        core.error(error_5.message);
-                        return [2 /*return*/, [[error_5.message]]];
-                    }
-                    return [2 /*return*/, [[]]];
-                case 6: return [2 /*return*/];
-            }
-        });
-    });
-}
-function fetchAPIResults(login, repoName, after, token) {
-    return __awaiter(this, void 0, void 0, function () {
-        var response, error_6;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, (0, graphql_1.graphql)(getQuery(login, repoName, after), {
-                            headers: {
-                                authorization: "token ".concat(token),
-                                accept: 'application/vnd.github.hawkgirl-preview+json'
-                            }
-                        })];
-                case 1:
-                    response = _a.sent();
-                    return [2 /*return*/, response];
-                case 2:
-                    error_6 = _a.sent();
-                    if (error_6 instanceof Error) {
-                        core.error(error_6.message);
-                        return [2 /*return*/, {}];
-                    }
-                    return [2 /*return*/, {}];
-                case 3: return [2 /*return*/];
-            }
-        });
-    });
-}
-function getQuery(login, repoName, after) {
-    var query = "\n      {\n        repository(owner: \"".concat(login, "\", name: \"").concat(repoName, "\") {\n          vulnerabilityAlerts(first: 100 ").concat(after ? ", after: \"".concat(after, "\"") : '', ") {\n            nodes {\n              createdAt\n              dismissedAt\n              securityVulnerability {\n                package {\n                  name\n                  ecosystem\n                }\n                advisory {\n                  description\n                  permalink\n                  severity\n                  ghsaId\n                }\n                firstPatchedVersion {\n                  identifier\n                }\n              }\n            }\n            totalCount\n            pageInfo {\n              hasNextPage\n              endCursor\n            }\n          }\n        }\n      }\n    ");
-    return query;
-}
-function generateSecurityReportForOrganization(organization, token) {
-    return __awaiter(this, void 0, void 0, function () {
-        var octokit, repos, _i, repos_1, repo, repoName, error_7;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 6, , 7]);
-                    if (!token) {
-                        core.error('Please set the INPUT_TOKEN env variable');
-                        return [2 /*return*/];
-                    }
-                    octokit = new rest_1.Octokit({ auth: token });
-                    return [4 /*yield*/, octokit.paginate(octokit.rest.repos.listForOrg, {
-                            org: organization
-                        })];
-                case 1:
-                    repos = _a.sent();
-                    _i = 0, repos_1 = repos;
-                    _a.label = 2;
-                case 2:
-                    if (!(_i < repos_1.length)) return [3 /*break*/, 5];
-                    repo = repos_1[_i];
-                    repoName = "".concat(repo.owner.login, "/").concat(repo.name);
-                    return [4 /*yield*/, generateSecurityReportForRepo(repoName, token)];
-                case 3:
-                    _a.sent();
-                    _a.label = 4;
-                case 4:
-                    _i++;
-                    return [3 /*break*/, 2];
-                case 5: return [3 /*break*/, 7];
-                case 6:
-                    error_7 = _a.sent();
-                    if (error_7 instanceof Error)
-                        core.setFailed(error_7.message);
-                    return [3 /*break*/, 7];
-                case 7: return [2 /*return*/];
-            }
-        });
-    });
-}
-function run() {
-    return __awaiter(this, void 0, void 0, function () {
-        var token, organization;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    token = core.getInput('token');
-                    organization = core.getInput('organization');
-                    if (!organization) {
-                        core.error('Please provide the organization name');
-                        return [2 /*return*/];
-                    }
-                    return [4 /*yield*/, generateSecurityReportForOrganization(organization, token)];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-run();
-
-
-/***/ }),
-
 /***/ 453:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -2381,7 +1915,7 @@ var createTokenAuth = function createTokenAuth2(token) {
 
 /***/ }),
 
-/***/ 3254:
+/***/ 3623:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3509,9 +3043,9 @@ __export(dist_src_exports, {
   Octokit: () => Octokit
 });
 module.exports = __toCommonJS(dist_src_exports);
-var import_core = __nccwpck_require__(3254);
+var import_core = __nccwpck_require__(3623);
 var import_plugin_request_log = __nccwpck_require__(655);
-var import_plugin_paginate_rest = __nccwpck_require__(3115);
+var import_plugin_paginate_rest = __nccwpck_require__(5648);
 var import_plugin_rest_endpoint_methods = __nccwpck_require__(2956);
 
 // pkg/dist-src/version.js
@@ -3531,7 +3065,7 @@ var Octokit = import_core.Octokit.plugin(
 
 /***/ }),
 
-/***/ 3115:
+/***/ 5648:
 /***/ ((module) => {
 
 "use strict";
@@ -6310,14 +5844,6 @@ function onceStrict (fn) {
   return f
 }
 
-
-/***/ }),
-
-/***/ 5736:
-/***/ (function(module) {
-
-!function(t,e){ true?module.exports=e():0}(this,function(){return function(t){function e(r){if(n[r])return n[r].exports;var o=n[r]={exports:{},id:r,loaded:!1};return t[r].call(o.exports,o,o.exports,e),o.loaded=!0,o.exports}var n={};return e.m=t,e.c=n,e.p="",e(0)}([function(t,e,n){t.exports=n(1)},function(t,e,n){"use strict";function r(t){return t&&t.__esModule?t:{"default":t}}Object.defineProperty(e,"__esModule",{value:!0});var o=n(2),u=r(o),i=n(37),a=r(i),c=n(38),f=r(c),l=n(42),s=n(91),p=n(102),d=function(){function t(e,n,r,o,u,i,c,f){(0,a["default"])(this,t),e?(e=(0,l.fixDataFormat)(e,n,c),this.columnSortFunc=f,this.originalArgs={data:e,rows:n,cols:r,agg:o,type:u,header:i},this.originalData=(0,l.tableCreator)(e,n,r,o,u,i,this.columnSortFunc),this.uniqueValues=(0,p.createUniqueValues)(e)):this.originalData={},this.data=this.originalData,this.collapsedRows={}}return(0,f["default"])(t,[{key:"update",value:function(t,e,n,r,o,u,i,a,c){return t=(0,l.fixDataFormat)(t,e,a),i||(this.originalArgs={data:t,rows:e,cols:n,agg:r,type:o,header:u},this.uniqueValues=(0,p.createUniqueValues)(t)),this.columnSortFunc=c,this.originalData=(0,l.tableCreator)(t,e,n,r,o,u,this.columnSortFunc),this.data=this.originalData,this.originalArgs.data=t,this.collapsedRows={},this}},{key:"collapse",value:function(t){if(this.collapsedRows[this.data.table[t].row])return this;var e=(0,s.collapse)(t,this.data);return e.collapsed&&(this.collapsedRows[this.data.table[t].row]=e.collapsed),this.data=e.uncollapsed,this}},{key:"expand",value:function(t){return this.data=(0,s.expand)(t,this.data,this.collapsedRows[this.data.table[t].row]),delete this.collapsedRows[this.data.table[t].row],this}},{key:"collapseAll",value:function(){var t=this;return this.data.table.map(function(t,e){return"rowHeader"===t.type?e:null}).filter(function(t){return null!==t}).reverse().forEach(function(e){t.collapse(e)}),this}},{key:"expandAll",value:function(){var t=this;return this.data.table.map(function(t,e){return"rowHeader"===t.type?e:null}).filter(function(t){return null!==t}).reverse().forEach(function(e){t.expand(e)}),this}},{key:"toggle",value:function(t){return this.data.table[t].row in this.collapsedRows?this.expand(t):this.collapse(t),this}},{key:"getData",value:function(t){return this.data.table[t]?this.collapsedRows[this.data.table[t].row]?this.collapsedRows[this.data.table[t].row].rawData:this.originalData.rawData[this.data.table[t].row]:null}},{key:"getUniqueValues",value:function(t){return this.uniqueValues[t]?(0,u["default"])(this.uniqueValues[t]):[]}},{key:"filter",value:function(t,e,n){var r=this;if("function"==typeof t||"string"==typeof t&&Array.isArray(e)){var o=(0,p.filter)(this.originalArgs.data,t,e,n),i=this.originalArgs,a=i.rows,c=i.cols,f=i.agg,l=i.type,s=i.header,d=(0,u["default"])(this.collapsedRows).reverse(),h=d.map(function(t){return r.originalData.table[t].value[0]});this.update(o,a,c,f,l,s,!0,this.columnSortFunc);var v=this.data.table.length-1;h.forEach(function(t){for(;v>=0;){if("rowHeader"===r.data.table[v].type&&t===r.data.table[v].value[0]){r.collapse(v);break}v-=1}})}return this}}]),t}();e["default"]=d,t.exports=e["default"]},function(t,e,n){t.exports={"default":n(3),__esModule:!0}},function(t,e,n){n(4),t.exports=n(24).Object.keys},function(t,e,n){var r=n(5),o=n(7);n(22)("keys",function(){return function(t){return o(r(t))}})},function(t,e,n){var r=n(6);t.exports=function(t){return Object(r(t))}},function(t,e){t.exports=function(t){if(void 0==t)throw TypeError("Can't call method on  "+t);return t}},function(t,e,n){var r=n(8),o=n(21);t.exports=Object.keys||function(t){return r(t,o)}},function(t,e,n){var r=n(9),o=n(10),u=n(13)(!1),i=n(17)("IE_PROTO");t.exports=function(t,e){var n,a=o(t),c=0,f=[];for(n in a)n!=i&&r(a,n)&&f.push(n);for(;e.length>c;)r(a,n=e[c++])&&(~u(f,n)||f.push(n));return f}},function(t,e){var n={}.hasOwnProperty;t.exports=function(t,e){return n.call(t,e)}},function(t,e,n){var r=n(11),o=n(6);t.exports=function(t){return r(o(t))}},function(t,e,n){var r=n(12);t.exports=Object("z").propertyIsEnumerable(0)?Object:function(t){return"String"==r(t)?t.split(""):Object(t)}},function(t,e){var n={}.toString;t.exports=function(t){return n.call(t).slice(8,-1)}},function(t,e,n){var r=n(10),o=n(14),u=n(16);t.exports=function(t){return function(e,n,i){var a,c=r(e),f=o(c.length),l=u(i,f);if(t&&n!=n){for(;f>l;)if(a=c[l++],a!=a)return!0}else for(;f>l;l++)if((t||l in c)&&c[l]===n)return t||l||0;return!t&&-1}}},function(t,e,n){var r=n(15),o=Math.min;t.exports=function(t){return t>0?o(r(t),9007199254740991):0}},function(t,e){var n=Math.ceil,r=Math.floor;t.exports=function(t){return isNaN(t=+t)?0:(t>0?r:n)(t)}},function(t,e,n){var r=n(15),o=Math.max,u=Math.min;t.exports=function(t,e){return t=r(t),t<0?o(t+e,0):u(t,e)}},function(t,e,n){var r=n(18)("keys"),o=n(20);t.exports=function(t){return r[t]||(r[t]=o(t))}},function(t,e,n){var r=n(19),o="__core-js_shared__",u=r[o]||(r[o]={});t.exports=function(t){return u[t]||(u[t]={})}},function(t,e){var n=t.exports="undefined"!=typeof window&&window.Math==Math?window:"undefined"!=typeof self&&self.Math==Math?self:Function("return this")();"number"==typeof __g&&(__g=n)},function(t,e){var n=0,r=Math.random();t.exports=function(t){return"Symbol(".concat(void 0===t?"":t,")_",(++n+r).toString(36))}},function(t,e){t.exports="constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf".split(",")},function(t,e,n){var r=n(23),o=n(24),u=n(33);t.exports=function(t,e){var n=(o.Object||{})[t]||Object[t],i={};i[t]=e(n),r(r.S+r.F*u(function(){n(1)}),"Object",i)}},function(t,e,n){var r=n(19),o=n(24),u=n(25),i=n(27),a="prototype",c=function(t,e,n){var f,l,s,p=t&c.F,d=t&c.G,h=t&c.S,v=t&c.P,y=t&c.B,g=t&c.W,b=d?o:o[e]||(o[e]={}),m=b[a],w=d?r:h?r[e]:(r[e]||{})[a];d&&(n=e);for(f in n)l=!p&&w&&void 0!==w[f],l&&f in b||(s=l?w[f]:n[f],b[f]=d&&"function"!=typeof w[f]?n[f]:y&&l?u(s,r):g&&w[f]==s?function(t){var e=function(e,n,r){if(this instanceof t){switch(arguments.length){case 0:return new t;case 1:return new t(e);case 2:return new t(e,n)}return new t(e,n,r)}return t.apply(this,arguments)};return e[a]=t[a],e}(s):v&&"function"==typeof s?u(Function.call,s):s,v&&((b.virtual||(b.virtual={}))[f]=s,t&c.R&&m&&!m[f]&&i(m,f,s)))};c.F=1,c.G=2,c.S=4,c.P=8,c.B=16,c.W=32,c.U=64,c.R=128,t.exports=c},function(t,e){var n=t.exports={version:"2.4.0"};"number"==typeof __e&&(__e=n)},function(t,e,n){var r=n(26);t.exports=function(t,e,n){if(r(t),void 0===e)return t;switch(n){case 1:return function(n){return t.call(e,n)};case 2:return function(n,r){return t.call(e,n,r)};case 3:return function(n,r,o){return t.call(e,n,r,o)}}return function(){return t.apply(e,arguments)}}},function(t,e){t.exports=function(t){if("function"!=typeof t)throw TypeError(t+" is not a function!");return t}},function(t,e,n){var r=n(28),o=n(36);t.exports=n(32)?function(t,e,n){return r.f(t,e,o(1,n))}:function(t,e,n){return t[e]=n,t}},function(t,e,n){var r=n(29),o=n(31),u=n(35),i=Object.defineProperty;e.f=n(32)?Object.defineProperty:function(t,e,n){if(r(t),e=u(e,!0),r(n),o)try{return i(t,e,n)}catch(a){}if("get"in n||"set"in n)throw TypeError("Accessors not supported!");return"value"in n&&(t[e]=n.value),t}},function(t,e,n){var r=n(30);t.exports=function(t){if(!r(t))throw TypeError(t+" is not an object!");return t}},function(t,e){t.exports=function(t){return"object"==typeof t?null!==t:"function"==typeof t}},function(t,e,n){t.exports=!n(32)&&!n(33)(function(){return 7!=Object.defineProperty(n(34)("div"),"a",{get:function(){return 7}}).a})},function(t,e,n){t.exports=!n(33)(function(){return 7!=Object.defineProperty({},"a",{get:function(){return 7}}).a})},function(t,e){t.exports=function(t){try{return!!t()}catch(e){return!0}}},function(t,e,n){var r=n(30),o=n(19).document,u=r(o)&&r(o.createElement);t.exports=function(t){return u?o.createElement(t):{}}},function(t,e,n){var r=n(30);t.exports=function(t,e){if(!r(t))return t;var n,o;if(e&&"function"==typeof(n=t.toString)&&!r(o=n.call(t)))return o;if("function"==typeof(n=t.valueOf)&&!r(o=n.call(t)))return o;if(!e&&"function"==typeof(n=t.toString)&&!r(o=n.call(t)))return o;throw TypeError("Can't convert object to primitive value")}},function(t,e){t.exports=function(t,e){return{enumerable:!(1&t),configurable:!(2&t),writable:!(4&t),value:e}}},function(t,e){"use strict";e.__esModule=!0,e["default"]=function(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}},function(t,e,n){"use strict";function r(t){return t&&t.__esModule?t:{"default":t}}e.__esModule=!0;var o=n(39),u=r(o);e["default"]=function(){function t(t,e){for(var n=0;n<e.length;n++){var r=e[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),(0,u["default"])(t,r.key,r)}}return function(e,n,r){return n&&t(e.prototype,n),r&&t(e,r),e}}()},function(t,e,n){t.exports={"default":n(40),__esModule:!0}},function(t,e,n){n(41);var r=n(24).Object;t.exports=function(t,e,n){return r.defineProperty(t,e,n)}},function(t,e,n){var r=n(23);r(r.S+r.F*!n(32),"Object",{defineProperty:n(28).f})},function(t,e,n){"use strict";function r(t){return t&&t.__esModule?t:{"default":t}}function o(t){var e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:[],n=arguments[2];if(!Array.isArray(t)||!t.length)return[];var r=[];return r="object"!==(0,_["default"])(t[0])||Array.isArray(t[0])?t.reduce(function(t,e,n,r){return 0!==n&&(Array.isArray(e)?t.push(e.reduce(function(t,e,n){return t[r[0][n]]=e,t},{})):t.push((0,w["default"])({},r[0],e))),t},[]):t,e.length>0?n===function(){}?r:(n||(n=function(t){return function(e,n){return e[t]>n[t]}}),e.reduceRight(function(t,e){return t.sort(n(e))},r)):r.sort(function(t,e){return(0,b["default"])(t)>(0,b["default"])(e)})}function u(t,e){return t.reduce(function(t,n){var r=n[e];return t[r]||(t[r]=[]),t[r].push(n),t},{})}function i(t){var e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:[],n=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{};if(0===t.length||0===e.length)return t;for(var r=u(t,e[0]),o=(0,y["default"])(r),a=(0,h["default"])(r),c=0;c<a.length;c++)n[o[c]]=i(a[c],e.slice(1),n[o[c]]);return n}function a(t){var e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:[],n=arguments.length>2&&void 0!==arguments[2]?arguments[2]:"",r=arguments.length>3&&void 0!==arguments[3]?arguments[3]:function(){return function(){}};if(0===e.length)return{columnHeaders:[n],mapToHeader:null};var o=i(t,e),u=[],a=1;return function c(t){var o=arguments.length>1&&void 0!==arguments[1]?arguments[1]:0,i=arguments[2];if("object"!==("undefined"==typeof t?"undefined":(0,_["default"])(t))||Array.isArray(t))return 1;for(var f=(0,y["default"])(t).sort(r(t,e,o)),l=0,s=0;s<f.length;s++){var p=c(t[f[s]],o+1,i[f[s]]);Array.isArray(t[f[s]])&&(i[f[s]]=a,a+=1),u[o]="undefined"==typeof u[o]?[n].concat(Array(p).fill(f[s])):u[o].concat(Array(p).fill(f[s])),l+=p}return l}(o,0,o),{columnHeaders:u,mapToHeader:o}}function c(t,e,n,r){return"undefined"==typeof e?n="count":"function"==typeof e&&(r=n||0),t.reduce(function(r,o,u,i){if("function"==typeof e)return e(r,o,u,i);switch(n){case"average":return r+=Number(o[e])/t.length;case"count":return r+=1;case"min":return 0===u?r=Number(o[e]):o[e]<r&&(r=Number(o[e])),r;case"max":return 0===u?r=Number(o[e]):o[e]>r&&(r=Number(o[e])),r;case"sum":return r+=Number(o[e]);default:return r+=1}},r||0)}function f(t,e){var n=e.filter(function(e){return!(e in t)});if(n.length>0)throw new Error("Check that these selected pivot categories exist: "+n.join(", "))}function l(t){function e(t,n){var r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:[],o=function(o){if(Array.isArray(t[o])){var a=i(t[o],u);_=null,function d(t,e){if(Array.isArray(t))if(o===_){var r=w[w.length-1].value;r[e]=c(t,l,s),w[w.length-1].value=r;var u=x[x.length-1].value;u[e]=t,x[x.length-1].value=u}else{_=o;var i=[o].concat(Array(e-1).fill(""),c(t,l,s),Array(b-(e+1)).fill("")),a=[o].concat(Array(e-1).fill(""),[t],Array(b-(e+1)).fill(""));x.push({value:a,type:"data",depth:n}),w.push({value:i,type:"data",depth:n,row:w.length+m.length})}else for(var f in t)d(t[f],e[f])}(a,g||1)}else{var f=r.shift(),p=f?f.value:[o].concat(Array(b-1).fill(""));w.push({value:p,depth:n,type:"rowHeader",row:w.length+m.length}),x.push({value:p,depth:n,type:"rowHeader"}),e(t[o],n+1,r)}};for(var a in t)o(a)}function n(t){var e=t.reduce(function(t,e){var n=e.type,r=e.value;return 0===t.length&&(t=Array(r.length).fill([])),"data"===n&&r.forEach(function(e,n){Array.isArray(e)&&(t[n]=t[n].concat(e))}),t},[]);return e.map(function(t){return t.length>0?c(t,l,s):"Totals"})}function r(t){var e=t.reduce(function(t,e){var n=e.type,r=e.value;if("data"===n){var o=t.length;t[o]=[],r.forEach(function(e){Array.isArray(e)&&(t[o]=t[o].concat(e))})}else 0===n&&t.push(r);return t},[]);return e.map(function(t){return t.length>0?c(t,l,s):""})}var o=arguments.length>1&&void 0!==arguments[1]?arguments[1]:[],u=arguments.length>2&&void 0!==arguments[2]?arguments[2]:[],l=arguments[3],s=arguments[4],d=arguments[5],h=arguments[6];if(0===t.length)return{rawData:[],table:[]};if(!Array.isArray(o)||!Array.isArray(u))throw new Error("rowsToPivot and colsToPivot must be of type array");f(t[0],o),f(t[0],u),"undefined"==typeof d&&(d="function"!=typeof l?s+" "+l:"Custom Agg");var v=a(t,u,d,h),y=Array.isArray(v.columnHeaders[0])?v.columnHeaders:[v.columnHeaders.concat(d)],g=v.mapToHeader,b=y[0].length,m=y.map(function(t,e){return{value:t,depth:e,type:"colHeader",row:e}}),w=[],x=[],_=null,O=[];if(o.length>0)for(var A=0;A<o.length;A++)e(i(t,o.slice(0,A+1)),0,O),O=(0,p["default"])([],w),A+1<o.length&&(w=[],x=[],_=null);else if(u.length>0)for(var S=0;S<u.length;S++)e(i(t,u.slice(0,S+1)),0,O),O=(0,p["default"])([],w),S+1<u.length&&(w=[],x=[],_=null);else w.push({value:[d,c(t,l,s)],type:"data",row:1,depth:0}),x=t.map(function(t){return{value:t,type:0,row:1,depth:0}});var j=r(x),M={value:n(x),type:"aggregated"},E=m.map(function(t){var e=t.value;return(0,p["default"])([],e)}),P=m.map(function(t,e){var n=(0,p["default"])({},t);return n.value=E[e],n}),k=0,D=P.concat(w,M).map(function(t,e){return"data"===t.type?(t.value=t.value.concat(j[k]),k+=1):t.value=t.value.concat(0===e?"Totals":""),t});return{table:D,rawData:m.concat(x)}}Object.defineProperty(e,"__esModule",{value:!0});var s=n(43),p=r(s),d=n(49),h=r(d),v=n(2),y=r(v),g=n(53),b=r(g),m=n(55),w=r(m),x=n(56),_=r(x);e.fixDataFormat=o,e.groupByCategory=u,e.groupByCategories=i,e.createColumnHeaders=a,e.accumulator=c,e.checkPivotCategories=f,e.tableCreator=l},function(t,e,n){t.exports={"default":n(44),__esModule:!0}},function(t,e,n){n(45),t.exports=n(24).Object.assign},function(t,e,n){var r=n(23);r(r.S+r.F,"Object",{assign:n(46)})},function(t,e,n){"use strict";var r=n(7),o=n(47),u=n(48),i=n(5),a=n(11),c=Object.assign;t.exports=!c||n(33)(function(){var t={},e={},n=Symbol(),r="abcdefghijklmnopqrst";return t[n]=7,r.split("").forEach(function(t){e[t]=t}),7!=c({},t)[n]||Object.keys(c({},e)).join("")!=r})?function(t,e){for(var n=i(t),c=arguments.length,f=1,l=o.f,s=u.f;c>f;)for(var p,d=a(arguments[f++]),h=l?r(d).concat(l(d)):r(d),v=h.length,y=0;v>y;)s.call(d,p=h[y++])&&(n[p]=d[p]);return n}:c},function(t,e){e.f=Object.getOwnPropertySymbols},function(t,e){e.f={}.propertyIsEnumerable},function(t,e,n){t.exports={"default":n(50),__esModule:!0}},function(t,e,n){n(51),t.exports=n(24).Object.values},function(t,e,n){var r=n(23),o=n(52)(!1);r(r.S,"Object",{values:function(t){return o(t)}})},function(t,e,n){var r=n(7),o=n(10),u=n(48).f;t.exports=function(t){return function(e){for(var n,i=o(e),a=r(i),c=a.length,f=0,l=[];c>f;)u.call(i,n=a[f++])&&l.push(t?[n,i[n]]:i[n]);return l}}},function(t,e,n){t.exports={"default":n(54),__esModule:!0}},function(t,e,n){var r=n(24),o=r.JSON||(r.JSON={stringify:JSON.stringify});t.exports=function(t){return o.stringify.apply(o,arguments)}},function(t,e,n){"use strict";function r(t){return t&&t.__esModule?t:{"default":t}}e.__esModule=!0;var o=n(39),u=r(o);e["default"]=function(t,e,n){return e in t?(0,u["default"])(t,e,{value:n,enumerable:!0,configurable:!0,writable:!0}):t[e]=n,t}},function(t,e,n){"use strict";function r(t){return t&&t.__esModule?t:{"default":t}}e.__esModule=!0;var o=n(57),u=r(o),i=n(77),a=r(i),c="function"==typeof a["default"]&&"symbol"==typeof u["default"]?function(t){return typeof t}:function(t){return t&&"function"==typeof a["default"]&&t.constructor===a["default"]&&t!==a["default"].prototype?"symbol":typeof t};e["default"]="function"==typeof a["default"]&&"symbol"===c(u["default"])?function(t){return"undefined"==typeof t?"undefined":c(t)}:function(t){return t&&"function"==typeof a["default"]&&t.constructor===a["default"]&&t!==a["default"].prototype?"symbol":"undefined"==typeof t?"undefined":c(t)}},function(t,e,n){t.exports={"default":n(58),__esModule:!0}},function(t,e,n){n(59),n(72),t.exports=n(76).f("iterator")},function(t,e,n){"use strict";var r=n(60)(!0);n(61)(String,"String",function(t){this._t=String(t),this._i=0},function(){var t,e=this._t,n=this._i;return n>=e.length?{value:void 0,done:!0}:(t=r(e,n),this._i+=t.length,{value:t,done:!1})})},function(t,e,n){var r=n(15),o=n(6);t.exports=function(t){return function(e,n){var u,i,a=String(o(e)),c=r(n),f=a.length;return c<0||c>=f?t?"":void 0:(u=a.charCodeAt(c),u<55296||u>56319||c+1===f||(i=a.charCodeAt(c+1))<56320||i>57343?t?a.charAt(c):u:t?a.slice(c,c+2):(u-55296<<10)+(i-56320)+65536)}}},function(t,e,n){"use strict";var r=n(62),o=n(23),u=n(63),i=n(27),a=n(9),c=n(64),f=n(65),l=n(69),s=n(71),p=n(70)("iterator"),d=!([].keys&&"next"in[].keys()),h="@@iterator",v="keys",y="values",g=function(){return this};t.exports=function(t,e,n,b,m,w,x){f(n,e,b);var _,O,A,S=function(t){if(!d&&t in P)return P[t];switch(t){case v:return function(){return new n(this,t)};case y:return function(){return new n(this,t)}}return function(){return new n(this,t)}},j=e+" Iterator",M=m==y,E=!1,P=t.prototype,k=P[p]||P[h]||m&&P[m],D=k||S(m),F=m?M?S("entries"):D:void 0,N="Array"==e?P.entries||k:k;if(N&&(A=s(N.call(new t)),A!==Object.prototype&&(l(A,j,!0),r||a(A,p)||i(A,p,g))),M&&k&&k.name!==y&&(E=!0,D=function(){return k.call(this)}),r&&!x||!d&&!E&&P[p]||i(P,p,D),c[e]=D,c[j]=g,m)if(_={values:M?D:S(y),keys:w?D:S(v),entries:F},x)for(O in _)O in P||u(P,O,_[O]);else o(o.P+o.F*(d||E),e,_);return _}},function(t,e){t.exports=!0},function(t,e,n){t.exports=n(27)},function(t,e){t.exports={}},function(t,e,n){"use strict";var r=n(66),o=n(36),u=n(69),i={};n(27)(i,n(70)("iterator"),function(){return this}),t.exports=function(t,e,n){t.prototype=r(i,{next:o(1,n)}),u(t,e+" Iterator")}},function(t,e,n){var r=n(29),o=n(67),u=n(21),i=n(17)("IE_PROTO"),a=function(){},c="prototype",f=function(){var t,e=n(34)("iframe"),r=u.length,o="<",i=">";for(e.style.display="none",n(68).appendChild(e),e.src="javascript:",t=e.contentWindow.document,t.open(),t.write(o+"script"+i+"document.F=Object"+o+"/script"+i),t.close(),f=t.F;r--;)delete f[c][u[r]];return f()};t.exports=Object.create||function(t,e){var n;return null!==t?(a[c]=r(t),n=new a,a[c]=null,n[i]=t):n=f(),void 0===e?n:o(n,e)}},function(t,e,n){var r=n(28),o=n(29),u=n(7);t.exports=n(32)?Object.defineProperties:function(t,e){o(t);for(var n,i=u(e),a=i.length,c=0;a>c;)r.f(t,n=i[c++],e[n]);return t}},function(t,e,n){t.exports=n(19).document&&document.documentElement},function(t,e,n){var r=n(28).f,o=n(9),u=n(70)("toStringTag");t.exports=function(t,e,n){t&&!o(t=n?t:t.prototype,u)&&r(t,u,{configurable:!0,value:e})}},function(t,e,n){var r=n(18)("wks"),o=n(20),u=n(19).Symbol,i="function"==typeof u,a=t.exports=function(t){return r[t]||(r[t]=i&&u[t]||(i?u:o)("Symbol."+t))};a.store=r},function(t,e,n){var r=n(9),o=n(5),u=n(17)("IE_PROTO"),i=Object.prototype;t.exports=Object.getPrototypeOf||function(t){return t=o(t),r(t,u)?t[u]:"function"==typeof t.constructor&&t instanceof t.constructor?t.constructor.prototype:t instanceof Object?i:null}},function(t,e,n){n(73);for(var r=n(19),o=n(27),u=n(64),i=n(70)("toStringTag"),a=["NodeList","DOMTokenList","MediaList","StyleSheetList","CSSRuleList"],c=0;c<5;c++){var f=a[c],l=r[f],s=l&&l.prototype;s&&!s[i]&&o(s,i,f),u[f]=u.Array}},function(t,e,n){"use strict";var r=n(74),o=n(75),u=n(64),i=n(10);t.exports=n(61)(Array,"Array",function(t,e){this._t=i(t),this._i=0,this._k=e},function(){var t=this._t,e=this._k,n=this._i++;return!t||n>=t.length?(this._t=void 0,o(1)):"keys"==e?o(0,n):"values"==e?o(0,t[n]):o(0,[n,t[n]])},"values"),u.Arguments=u.Array,r("keys"),r("values"),r("entries")},function(t,e){t.exports=function(){}},function(t,e){t.exports=function(t,e){return{value:e,done:!!t}}},function(t,e,n){e.f=n(70)},function(t,e,n){t.exports={"default":n(78),__esModule:!0}},function(t,e,n){n(79),n(88),n(89),n(90),t.exports=n(24).Symbol},function(t,e,n){"use strict";var r=n(19),o=n(9),u=n(32),i=n(23),a=n(63),c=n(80).KEY,f=n(33),l=n(18),s=n(69),p=n(20),d=n(70),h=n(76),v=n(81),y=n(82),g=n(83),b=n(84),m=n(29),w=n(10),x=n(35),_=n(36),O=n(66),A=n(85),S=n(87),j=n(28),M=n(7),E=S.f,P=j.f,k=A.f,D=r.Symbol,F=r.JSON,N=F&&F.stringify,T="prototype",C=d("_hidden"),H=d("toPrimitive"),R={}.propertyIsEnumerable,I=l("symbol-registry"),q=l("symbols"),V=l("op-symbols"),J=Object[T],L="function"==typeof D,U=r.QObject,W=!U||!U[T]||!U[T].findChild,B=u&&f(function(){return 7!=O(P({},"a",{get:function(){return P(this,"a",{value:7}).a}})).a})?function(t,e,n){var r=E(J,e);r&&delete J[e],P(t,e,n),r&&t!==J&&P(J,e,r)}:P,G=function(t){var e=q[t]=O(D[T]);return e._k=t,e},K=L&&"symbol"==typeof D.iterator?function(t){return"symbol"==typeof t}:function(t){return t instanceof D},z=function(t,e,n){return t===J&&z(V,e,n),m(t),e=x(e,!0),m(n),o(q,e)?(n.enumerable?(o(t,C)&&t[C][e]&&(t[C][e]=!1),n=O(n,{enumerable:_(0,!1)})):(o(t,C)||P(t,C,_(1,{})),t[C][e]=!0),B(t,e,n)):P(t,e,n)},Y=function(t,e){m(t);for(var n,r=g(e=w(e)),o=0,u=r.length;u>o;)z(t,n=r[o++],e[n]);return t},Q=function(t,e){return void 0===e?O(t):Y(O(t),e)},X=function(t){var e=R.call(this,t=x(t,!0));return!(this===J&&o(q,t)&&!o(V,t))&&(!(e||!o(this,t)||!o(q,t)||o(this,C)&&this[C][t])||e)},Z=function(t,e){if(t=w(t),e=x(e,!0),t!==J||!o(q,e)||o(V,e)){var n=E(t,e);return!n||!o(q,e)||o(t,C)&&t[C][e]||(n.enumerable=!0),n}},$=function(t){for(var e,n=k(w(t)),r=[],u=0;n.length>u;)o(q,e=n[u++])||e==C||e==c||r.push(e);return r},tt=function(t){for(var e,n=t===J,r=k(n?V:w(t)),u=[],i=0;r.length>i;)!o(q,e=r[i++])||n&&!o(J,e)||u.push(q[e]);return u};L||(D=function(){if(this instanceof D)throw TypeError("Symbol is not a constructor!");var t=p(arguments.length>0?arguments[0]:void 0),e=function(n){this===J&&e.call(V,n),o(this,C)&&o(this[C],t)&&(this[C][t]=!1),B(this,t,_(1,n))};return u&&W&&B(J,t,{configurable:!0,set:e}),G(t)},a(D[T],"toString",function(){return this._k}),S.f=Z,j.f=z,n(86).f=A.f=$,n(48).f=X,n(47).f=tt,u&&!n(62)&&a(J,"propertyIsEnumerable",X,!0),h.f=function(t){return G(d(t))}),i(i.G+i.W+i.F*!L,{Symbol:D});for(var et="hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables".split(","),nt=0;et.length>nt;)d(et[nt++]);for(var et=M(d.store),nt=0;et.length>nt;)v(et[nt++]);i(i.S+i.F*!L,"Symbol",{"for":function(t){return o(I,t+="")?I[t]:I[t]=D(t)},keyFor:function(t){if(K(t))return y(I,t);throw TypeError(t+" is not a symbol!")},useSetter:function(){W=!0},useSimple:function(){W=!1}}),i(i.S+i.F*!L,"Object",{create:Q,defineProperty:z,defineProperties:Y,getOwnPropertyDescriptor:Z,getOwnPropertyNames:$,getOwnPropertySymbols:tt}),F&&i(i.S+i.F*(!L||f(function(){var t=D();return"[null]"!=N([t])||"{}"!=N({a:t})||"{}"!=N(Object(t))})),"JSON",{stringify:function(t){if(void 0!==t&&!K(t)){for(var e,n,r=[t],o=1;arguments.length>o;)r.push(arguments[o++]);return e=r[1],"function"==typeof e&&(n=e),!n&&b(e)||(e=function(t,e){if(n&&(e=n.call(this,t,e)),!K(e))return e}),r[1]=e,N.apply(F,r)}}}),D[T][H]||n(27)(D[T],H,D[T].valueOf),s(D,"Symbol"),s(Math,"Math",!0),s(r.JSON,"JSON",!0)},function(t,e,n){var r=n(20)("meta"),o=n(30),u=n(9),i=n(28).f,a=0,c=Object.isExtensible||function(){return!0},f=!n(33)(function(){return c(Object.preventExtensions({}))}),l=function(t){i(t,r,{value:{i:"O"+ ++a,w:{}}})},s=function(t,e){if(!o(t))return"symbol"==typeof t?t:("string"==typeof t?"S":"P")+t;if(!u(t,r)){if(!c(t))return"F";if(!e)return"E";l(t)}return t[r].i},p=function(t,e){if(!u(t,r)){if(!c(t))return!0;if(!e)return!1;l(t)}return t[r].w},d=function(t){return f&&h.NEED&&c(t)&&!u(t,r)&&l(t),t},h=t.exports={KEY:r,NEED:!1,fastKey:s,getWeak:p,onFreeze:d}},function(t,e,n){var r=n(19),o=n(24),u=n(62),i=n(76),a=n(28).f;t.exports=function(t){var e=o.Symbol||(o.Symbol=u?{}:r.Symbol||{});"_"==t.charAt(0)||t in e||a(e,t,{value:i.f(t)})}},function(t,e,n){var r=n(7),o=n(10);t.exports=function(t,e){for(var n,u=o(t),i=r(u),a=i.length,c=0;a>c;)if(u[n=i[c++]]===e)return n}},function(t,e,n){var r=n(7),o=n(47),u=n(48);t.exports=function(t){var e=r(t),n=o.f;if(n)for(var i,a=n(t),c=u.f,f=0;a.length>f;)c.call(t,i=a[f++])&&e.push(i);return e}},function(t,e,n){var r=n(12);t.exports=Array.isArray||function(t){return"Array"==r(t)}},function(t,e,n){var r=n(10),o=n(86).f,u={}.toString,i="object"==typeof window&&window&&Object.getOwnPropertyNames?Object.getOwnPropertyNames(window):[],a=function(t){try{return o(t)}catch(e){return i.slice()}};t.exports.f=function(t){return i&&"[object Window]"==u.call(t)?a(t):o(r(t))}},function(t,e,n){var r=n(8),o=n(21).concat("length","prototype");e.f=Object.getOwnPropertyNames||function(t){return r(t,o)}},function(t,e,n){var r=n(48),o=n(36),u=n(10),i=n(35),a=n(9),c=n(31),f=Object.getOwnPropertyDescriptor;e.f=n(32)?f:function(t,e){if(t=u(t),e=i(e,!0),c)try{return f(t,e)}catch(n){}if(a(t,e))return o(!r.f.call(t,e),t[e])}},function(t,e){},function(t,e,n){n(81)("asyncIterator")},function(t,e,n){n(81)("observable")},function(t,e,n){"use strict";function r(t){return t&&t.__esModule?t:{"default":t}}function o(t,e){var n=e.table[t],r=n.type,o=n.depth;if("rowHeader"!==r&&"colHeader"!==r)return{uncollapsed:e};for(var u=t+1,i=e.table[u].depth,a={table:e.table.slice(0,u),rawData:e.rawData.slice(0,u)},c={table:[],rawData:[]};u<e.table.length&&i>o;)c.rawData.push(e.rawData[u]),c.table.push(e.table[u]),u+=1,u<e.table.length&&(i=e.table[u].depth);return a.table=a.table.concat(e.table.slice(u)),a.rawData=a.rawData.concat(e.rawData.slice(u)),{uncollapsed:a,collapsed:c}}function u(t,e,n){var r,o;return n?((r=e.table).splice.apply(r,[t+1,0].concat((0,a["default"])(n.table))),(o=e.rawData).splice.apply(o,[t+1,0].concat((0,a["default"])(n.rawData))),e):e}Object.defineProperty(e,"__esModule",{value:!0});var i=n(92),a=r(i);e.collapse=o,e.expand=u},function(t,e,n){"use strict";function r(t){return t&&t.__esModule?t:{"default":t}}e.__esModule=!0;var o=n(93),u=r(o);e["default"]=function(t){if(Array.isArray(t)){for(var e=0,n=Array(t.length);e<t.length;e++)n[e]=t[e];return n}return(0,u["default"])(t)}},function(t,e,n){t.exports={"default":n(94),__esModule:!0}},function(t,e,n){n(59),n(95),t.exports=n(24).Array.from},function(t,e,n){"use strict";var r=n(25),o=n(23),u=n(5),i=n(96),a=n(97),c=n(14),f=n(98),l=n(99);o(o.S+o.F*!n(101)(function(t){Array.from(t)}),"Array",{from:function(t){var e,n,o,s,p=u(t),d="function"==typeof this?this:Array,h=arguments.length,v=h>1?arguments[1]:void 0,y=void 0!==v,g=0,b=l(p);if(y&&(v=r(v,h>2?arguments[2]:void 0,2)),void 0==b||d==Array&&a(b))for(e=c(p.length),n=new d(e);e>g;g++)f(n,g,y?v(p[g],g):p[g]);else for(s=b.call(p),n=new d;!(o=s.next()).done;g++)f(n,g,y?i(s,v,[o.value,g],!0):o.value);return n.length=g,n}})},function(t,e,n){var r=n(29);t.exports=function(t,e,n,o){try{return o?e(r(n)[0],n[1]):e(n)}catch(u){var i=t["return"];throw void 0!==i&&r(i.call(t)),u}}},function(t,e,n){var r=n(64),o=n(70)("iterator"),u=Array.prototype;t.exports=function(t){return void 0!==t&&(r.Array===t||u[o]===t)}},function(t,e,n){"use strict";var r=n(28),o=n(36);t.exports=function(t,e,n){e in t?r.f(t,e,o(0,n)):t[e]=n}},function(t,e,n){var r=n(100),o=n(70)("iterator"),u=n(64);t.exports=n(24).getIteratorMethod=function(t){if(void 0!=t)return t[o]||t["@@iterator"]||u[r(t)]}},function(t,e,n){var r=n(12),o=n(70)("toStringTag"),u="Arguments"==r(function(){return arguments}()),i=function(t,e){try{return t[e]}catch(n){}};t.exports=function(t){var e,n,a;return void 0===t?"Undefined":null===t?"Null":"string"==typeof(n=i(e=Object(t),o))?n:u?r(e):"Object"==(a=r(e))&&"function"==typeof e.callee?"Arguments":a}},function(t,e,n){var r=n(70)("iterator"),o=!1;try{var u=[7][r]();u["return"]=function(){o=!0},Array.from(u,function(){throw 2})}catch(i){}t.exports=function(t,e){if(!e&&!o)return!1;var n=!1;try{var u=[7],i=u[r]();i.next=function(){return{done:n=!0}},u[r]=function(){return i},t(u)}catch(a){}return n}},function(t,e,n){"use strict";function r(t){return t&&t.__esModule?t:{"default":t}}function o(t){return t.reduce(function(t,e){return(0,a["default"])(e).forEach(function(n){t[n]||(t[n]={}),t[n][e[n]]=!0}),t},{})}function u(t,e,n,r){return"function"!=typeof e?t.filter(function(t){var o=t[e];switch(r){case"include":return n.indexOf(o)!==-1;case"exclude":return n.indexOf(o)===-1;default:return n.indexOf(o)===-1}}):t.filter(function(t,n,r){return e(t,n,r)})}Object.defineProperty(e,"__esModule",{value:!0});var i=n(2),a=r(i);e.createUniqueValues=o,e.filter=u}])});
-//# sourceMappingURL=quick-pivot.min.js.map
 
 /***/ }),
 
@@ -25007,7 +24533,7 @@ const MockPool = __nccwpck_require__(8712)
 const { matchValue, buildMockOptions } = __nccwpck_require__(3997)
 const { InvalidArgumentError, UndiciError } = __nccwpck_require__(3427)
 const Dispatcher = __nccwpck_require__(1846)
-const Pluralizer = __nccwpck_require__(3623)
+const Pluralizer = __nccwpck_require__(1370)
 const PendingInterceptorsFormatter = __nccwpck_require__(577)
 
 class FakeWeakRef {
@@ -25973,7 +25499,7 @@ module.exports = class PendingInterceptorsFormatter {
 
 /***/ }),
 
-/***/ 3623:
+/***/ 1370:
 /***/ ((module) => {
 
 "use strict";
@@ -28985,7 +28511,7 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 5648:
+/***/ 2729:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -29103,7 +28629,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _rng = _interopRequireDefault(__nccwpck_require__(5648));
+var _rng = _interopRequireDefault(__nccwpck_require__(2729));
 
 var _stringify = _interopRequireDefault(__nccwpck_require__(7411));
 
@@ -29325,7 +28851,7 @@ Object.defineProperty(exports, "__esModule", ({
 }));
 exports["default"] = void 0;
 
-var _rng = _interopRequireDefault(__nccwpck_require__(5648));
+var _rng = _interopRequireDefault(__nccwpck_require__(2729));
 
 var _stringify = _interopRequireDefault(__nccwpck_require__(7411));
 
@@ -55477,6 +55003,14 @@ if(typeof window !== 'undefined' && !window.XLSX) try { window.XLSX = XLSX; } ca
 
 /***/ }),
 
+/***/ 2642:
+/***/ ((module) => {
+
+module.exports = eval("require")("archiver");
+
+
+/***/ }),
+
 /***/ 9491:
 /***/ ((module) => {
 
@@ -57324,760 +56858,6 @@ function parseParams (str) {
 module.exports = parseParams
 
 
-/***/ }),
-
-/***/ 9126:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-"use strict";
-// ESM COMPAT FLAG
-__nccwpck_require__.r(__webpack_exports__);
-
-// EXPORTS
-__nccwpck_require__.d(__webpack_exports__, {
-  "GraphqlResponseError": () => (/* binding */ GraphqlResponseError),
-  "graphql": () => (/* binding */ graphql2),
-  "withCustomRequest": () => (/* binding */ withCustomRequest)
-});
-
-;// CONCATENATED MODULE: ./node_modules/@octokit/graphql/node_modules/universal-user-agent/index.js
-function getUserAgent() {
-  if (typeof navigator === "object" && "userAgent" in navigator) {
-    return navigator.userAgent;
-  }
-
-  if (typeof process === "object" && process.version !== undefined) {
-    return `Node.js/${process.version.substr(1)} (${process.platform}; ${
-      process.arch
-    })`;
-  }
-
-  return "<environment undetectable>";
-}
-
-;// CONCATENATED MODULE: ./node_modules/@octokit/graphql/node_modules/@octokit/endpoint/dist-bundle/index.js
-// pkg/dist-src/defaults.js
-
-
-// pkg/dist-src/version.js
-var VERSION = "0.0.0-development";
-
-// pkg/dist-src/defaults.js
-var userAgent = `octokit-endpoint.js/${VERSION} ${getUserAgent()}`;
-var DEFAULTS = {
-  method: "GET",
-  baseUrl: "https://api.github.com",
-  headers: {
-    accept: "application/vnd.github.v3+json",
-    "user-agent": userAgent
-  },
-  mediaType: {
-    format: ""
-  }
-};
-
-// pkg/dist-src/util/lowercase-keys.js
-function lowercaseKeys(object) {
-  if (!object) {
-    return {};
-  }
-  return Object.keys(object).reduce((newObj, key) => {
-    newObj[key.toLowerCase()] = object[key];
-    return newObj;
-  }, {});
-}
-
-// pkg/dist-src/util/is-plain-object.js
-function isPlainObject(value) {
-  if (typeof value !== "object" || value === null)
-    return false;
-  if (Object.prototype.toString.call(value) !== "[object Object]")
-    return false;
-  const proto = Object.getPrototypeOf(value);
-  if (proto === null)
-    return true;
-  const Ctor = Object.prototype.hasOwnProperty.call(proto, "constructor") && proto.constructor;
-  return typeof Ctor === "function" && Ctor instanceof Ctor && Function.prototype.call(Ctor) === Function.prototype.call(value);
-}
-
-// pkg/dist-src/util/merge-deep.js
-function mergeDeep(defaults, options) {
-  const result = Object.assign({}, defaults);
-  Object.keys(options).forEach((key) => {
-    if (isPlainObject(options[key])) {
-      if (!(key in defaults))
-        Object.assign(result, { [key]: options[key] });
-      else
-        result[key] = mergeDeep(defaults[key], options[key]);
-    } else {
-      Object.assign(result, { [key]: options[key] });
-    }
-  });
-  return result;
-}
-
-// pkg/dist-src/util/remove-undefined-properties.js
-function removeUndefinedProperties(obj) {
-  for (const key in obj) {
-    if (obj[key] === void 0) {
-      delete obj[key];
-    }
-  }
-  return obj;
-}
-
-// pkg/dist-src/merge.js
-function merge(defaults, route, options) {
-  if (typeof route === "string") {
-    let [method, url] = route.split(" ");
-    options = Object.assign(url ? { method, url } : { url: method }, options);
-  } else {
-    options = Object.assign({}, route);
-  }
-  options.headers = lowercaseKeys(options.headers);
-  removeUndefinedProperties(options);
-  removeUndefinedProperties(options.headers);
-  const mergedOptions = mergeDeep(defaults || {}, options);
-  if (options.url === "/graphql") {
-    if (defaults && defaults.mediaType.previews?.length) {
-      mergedOptions.mediaType.previews = defaults.mediaType.previews.filter(
-        (preview) => !mergedOptions.mediaType.previews.includes(preview)
-      ).concat(mergedOptions.mediaType.previews);
-    }
-    mergedOptions.mediaType.previews = (mergedOptions.mediaType.previews || []).map((preview) => preview.replace(/-preview/, ""));
-  }
-  return mergedOptions;
-}
-
-// pkg/dist-src/util/add-query-parameters.js
-function addQueryParameters(url, parameters) {
-  const separator = /\?/.test(url) ? "&" : "?";
-  const names = Object.keys(parameters);
-  if (names.length === 0) {
-    return url;
-  }
-  return url + separator + names.map((name) => {
-    if (name === "q") {
-      return "q=" + parameters.q.split("+").map(encodeURIComponent).join("+");
-    }
-    return `${name}=${encodeURIComponent(parameters[name])}`;
-  }).join("&");
-}
-
-// pkg/dist-src/util/extract-url-variable-names.js
-var urlVariableRegex = /\{[^}]+\}/g;
-function removeNonChars(variableName) {
-  return variableName.replace(/^\W+|\W+$/g, "").split(/,/);
-}
-function extractUrlVariableNames(url) {
-  const matches = url.match(urlVariableRegex);
-  if (!matches) {
-    return [];
-  }
-  return matches.map(removeNonChars).reduce((a, b) => a.concat(b), []);
-}
-
-// pkg/dist-src/util/omit.js
-function omit(object, keysToOmit) {
-  const result = { __proto__: null };
-  for (const key of Object.keys(object)) {
-    if (keysToOmit.indexOf(key) === -1) {
-      result[key] = object[key];
-    }
-  }
-  return result;
-}
-
-// pkg/dist-src/util/url-template.js
-function encodeReserved(str) {
-  return str.split(/(%[0-9A-Fa-f]{2})/g).map(function(part) {
-    if (!/%[0-9A-Fa-f]/.test(part)) {
-      part = encodeURI(part).replace(/%5B/g, "[").replace(/%5D/g, "]");
-    }
-    return part;
-  }).join("");
-}
-function encodeUnreserved(str) {
-  return encodeURIComponent(str).replace(/[!'()*]/g, function(c) {
-    return "%" + c.charCodeAt(0).toString(16).toUpperCase();
-  });
-}
-function encodeValue(operator, value, key) {
-  value = operator === "+" || operator === "#" ? encodeReserved(value) : encodeUnreserved(value);
-  if (key) {
-    return encodeUnreserved(key) + "=" + value;
-  } else {
-    return value;
-  }
-}
-function isDefined(value) {
-  return value !== void 0 && value !== null;
-}
-function isKeyOperator(operator) {
-  return operator === ";" || operator === "&" || operator === "?";
-}
-function getValues(context, operator, key, modifier) {
-  var value = context[key], result = [];
-  if (isDefined(value) && value !== "") {
-    if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-      value = value.toString();
-      if (modifier && modifier !== "*") {
-        value = value.substring(0, parseInt(modifier, 10));
-      }
-      result.push(
-        encodeValue(operator, value, isKeyOperator(operator) ? key : "")
-      );
-    } else {
-      if (modifier === "*") {
-        if (Array.isArray(value)) {
-          value.filter(isDefined).forEach(function(value2) {
-            result.push(
-              encodeValue(operator, value2, isKeyOperator(operator) ? key : "")
-            );
-          });
-        } else {
-          Object.keys(value).forEach(function(k) {
-            if (isDefined(value[k])) {
-              result.push(encodeValue(operator, value[k], k));
-            }
-          });
-        }
-      } else {
-        const tmp = [];
-        if (Array.isArray(value)) {
-          value.filter(isDefined).forEach(function(value2) {
-            tmp.push(encodeValue(operator, value2));
-          });
-        } else {
-          Object.keys(value).forEach(function(k) {
-            if (isDefined(value[k])) {
-              tmp.push(encodeUnreserved(k));
-              tmp.push(encodeValue(operator, value[k].toString()));
-            }
-          });
-        }
-        if (isKeyOperator(operator)) {
-          result.push(encodeUnreserved(key) + "=" + tmp.join(","));
-        } else if (tmp.length !== 0) {
-          result.push(tmp.join(","));
-        }
-      }
-    }
-  } else {
-    if (operator === ";") {
-      if (isDefined(value)) {
-        result.push(encodeUnreserved(key));
-      }
-    } else if (value === "" && (operator === "&" || operator === "?")) {
-      result.push(encodeUnreserved(key) + "=");
-    } else if (value === "") {
-      result.push("");
-    }
-  }
-  return result;
-}
-function parseUrl(template) {
-  return {
-    expand: expand.bind(null, template)
-  };
-}
-function expand(template, context) {
-  var operators = ["+", "#", ".", "/", ";", "?", "&"];
-  template = template.replace(
-    /\{([^\{\}]+)\}|([^\{\}]+)/g,
-    function(_, expression, literal) {
-      if (expression) {
-        let operator = "";
-        const values = [];
-        if (operators.indexOf(expression.charAt(0)) !== -1) {
-          operator = expression.charAt(0);
-          expression = expression.substr(1);
-        }
-        expression.split(/,/g).forEach(function(variable) {
-          var tmp = /([^:\*]*)(?::(\d+)|(\*))?/.exec(variable);
-          values.push(getValues(context, operator, tmp[1], tmp[2] || tmp[3]));
-        });
-        if (operator && operator !== "+") {
-          var separator = ",";
-          if (operator === "?") {
-            separator = "&";
-          } else if (operator !== "#") {
-            separator = operator;
-          }
-          return (values.length !== 0 ? operator : "") + values.join(separator);
-        } else {
-          return values.join(",");
-        }
-      } else {
-        return encodeReserved(literal);
-      }
-    }
-  );
-  if (template === "/") {
-    return template;
-  } else {
-    return template.replace(/\/$/, "");
-  }
-}
-
-// pkg/dist-src/parse.js
-function parse(options) {
-  let method = options.method.toUpperCase();
-  let url = (options.url || "/").replace(/:([a-z]\w+)/g, "{$1}");
-  let headers = Object.assign({}, options.headers);
-  let body;
-  let parameters = omit(options, [
-    "method",
-    "baseUrl",
-    "url",
-    "headers",
-    "request",
-    "mediaType"
-  ]);
-  const urlVariableNames = extractUrlVariableNames(url);
-  url = parseUrl(url).expand(parameters);
-  if (!/^http/.test(url)) {
-    url = options.baseUrl + url;
-  }
-  const omittedParameters = Object.keys(options).filter((option) => urlVariableNames.includes(option)).concat("baseUrl");
-  const remainingParameters = omit(parameters, omittedParameters);
-  const isBinaryRequest = /application\/octet-stream/i.test(headers.accept);
-  if (!isBinaryRequest) {
-    if (options.mediaType.format) {
-      headers.accept = headers.accept.split(/,/).map(
-        (format) => format.replace(
-          /application\/vnd(\.\w+)(\.v3)?(\.\w+)?(\+json)?$/,
-          `application/vnd$1$2.${options.mediaType.format}`
-        )
-      ).join(",");
-    }
-    if (url.endsWith("/graphql")) {
-      if (options.mediaType.previews?.length) {
-        const previewsFromAcceptHeader = headers.accept.match(/[\w-]+(?=-preview)/g) || [];
-        headers.accept = previewsFromAcceptHeader.concat(options.mediaType.previews).map((preview) => {
-          const format = options.mediaType.format ? `.${options.mediaType.format}` : "+json";
-          return `application/vnd.github.${preview}-preview${format}`;
-        }).join(",");
-      }
-    }
-  }
-  if (["GET", "HEAD"].includes(method)) {
-    url = addQueryParameters(url, remainingParameters);
-  } else {
-    if ("data" in remainingParameters) {
-      body = remainingParameters.data;
-    } else {
-      if (Object.keys(remainingParameters).length) {
-        body = remainingParameters;
-      }
-    }
-  }
-  if (!headers["content-type"] && typeof body !== "undefined") {
-    headers["content-type"] = "application/json; charset=utf-8";
-  }
-  if (["PATCH", "PUT"].includes(method) && typeof body === "undefined") {
-    body = "";
-  }
-  return Object.assign(
-    { method, url, headers },
-    typeof body !== "undefined" ? { body } : null,
-    options.request ? { request: options.request } : null
-  );
-}
-
-// pkg/dist-src/endpoint-with-defaults.js
-function endpointWithDefaults(defaults, route, options) {
-  return parse(merge(defaults, route, options));
-}
-
-// pkg/dist-src/with-defaults.js
-function withDefaults(oldDefaults, newDefaults) {
-  const DEFAULTS2 = merge(oldDefaults, newDefaults);
-  const endpoint2 = endpointWithDefaults.bind(null, DEFAULTS2);
-  return Object.assign(endpoint2, {
-    DEFAULTS: DEFAULTS2,
-    defaults: withDefaults.bind(null, DEFAULTS2),
-    merge: merge.bind(null, DEFAULTS2),
-    parse
-  });
-}
-
-// pkg/dist-src/index.js
-var endpoint = withDefaults(null, DEFAULTS);
-
-
-;// CONCATENATED MODULE: ./node_modules/@octokit/graphql/node_modules/@octokit/request-error/dist-src/index.js
-class RequestError extends Error {
-  name;
-  /**
-   * http status code
-   */
-  status;
-  /**
-   * Request options that lead to the error.
-   */
-  request;
-  /**
-   * Response object if a response was received
-   */
-  response;
-  constructor(message, statusCode, options) {
-    super(message);
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
-    }
-    this.name = "HttpError";
-    this.status = statusCode;
-    if ("response" in options) {
-      this.response = options.response;
-    }
-    const requestCopy = Object.assign({}, options.request);
-    if (options.request.headers.authorization) {
-      requestCopy.headers = Object.assign({}, options.request.headers, {
-        authorization: options.request.headers.authorization.replace(
-          / .*$/,
-          " [REDACTED]"
-        )
-      });
-    }
-    requestCopy.url = requestCopy.url.replace(/\bclient_secret=\w+/g, "client_secret=[REDACTED]").replace(/\baccess_token=\w+/g, "access_token=[REDACTED]");
-    this.request = requestCopy;
-  }
-}
-
-
-;// CONCATENATED MODULE: ./node_modules/@octokit/graphql/node_modules/@octokit/request/dist-bundle/index.js
-// pkg/dist-src/index.js
-
-
-
-// pkg/dist-src/version.js
-var dist_bundle_VERSION = "0.0.0-development";
-
-// pkg/dist-src/is-plain-object.js
-function dist_bundle_isPlainObject(value) {
-  if (typeof value !== "object" || value === null)
-    return false;
-  if (Object.prototype.toString.call(value) !== "[object Object]")
-    return false;
-  const proto = Object.getPrototypeOf(value);
-  if (proto === null)
-    return true;
-  const Ctor = Object.prototype.hasOwnProperty.call(proto, "constructor") && proto.constructor;
-  return typeof Ctor === "function" && Ctor instanceof Ctor && Function.prototype.call(Ctor) === Function.prototype.call(value);
-}
-
-// pkg/dist-src/fetch-wrapper.js
-
-
-// pkg/dist-src/get-buffer-response.js
-function getBufferResponse(response) {
-  return response.arrayBuffer();
-}
-
-// pkg/dist-src/fetch-wrapper.js
-function fetchWrapper(requestOptions) {
-  const log = requestOptions.request && requestOptions.request.log ? requestOptions.request.log : console;
-  const parseSuccessResponseBody = requestOptions.request?.parseSuccessResponseBody !== false;
-  if (dist_bundle_isPlainObject(requestOptions.body) || Array.isArray(requestOptions.body)) {
-    requestOptions.body = JSON.stringify(requestOptions.body);
-  }
-  let headers = {};
-  let status;
-  let url;
-  let { fetch } = globalThis;
-  if (requestOptions.request?.fetch) {
-    fetch = requestOptions.request.fetch;
-  }
-  if (!fetch) {
-    throw new Error(
-      "fetch is not set. Please pass a fetch implementation as new Octokit({ request: { fetch }}). Learn more at https://github.com/octokit/octokit.js/#fetch-missing"
-    );
-  }
-  return fetch(requestOptions.url, {
-    method: requestOptions.method,
-    body: requestOptions.body,
-    redirect: requestOptions.request?.redirect,
-    // Header values must be `string`
-    headers: Object.fromEntries(
-      Object.entries(requestOptions.headers).map(([name, value]) => [
-        name,
-        String(value)
-      ])
-    ),
-    signal: requestOptions.request?.signal,
-    // duplex must be set if request.body is ReadableStream or Async Iterables.
-    // See https://fetch.spec.whatwg.org/#dom-requestinit-duplex.
-    ...requestOptions.body && { duplex: "half" }
-  }).then(async (response) => {
-    url = response.url;
-    status = response.status;
-    for (const keyAndValue of response.headers) {
-      headers[keyAndValue[0]] = keyAndValue[1];
-    }
-    if ("deprecation" in headers) {
-      const matches = headers.link && headers.link.match(/<([^>]+)>; rel="deprecation"/);
-      const deprecationLink = matches && matches.pop();
-      log.warn(
-        `[@octokit/request] "${requestOptions.method} ${requestOptions.url}" is deprecated. It is scheduled to be removed on ${headers.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""}`
-      );
-    }
-    if (status === 204 || status === 205) {
-      return;
-    }
-    if (requestOptions.method === "HEAD") {
-      if (status < 400) {
-        return;
-      }
-      throw new RequestError(response.statusText, status, {
-        response: {
-          url,
-          status,
-          headers,
-          data: void 0
-        },
-        request: requestOptions
-      });
-    }
-    if (status === 304) {
-      throw new RequestError("Not modified", status, {
-        response: {
-          url,
-          status,
-          headers,
-          data: await getResponseData(response)
-        },
-        request: requestOptions
-      });
-    }
-    if (status >= 400) {
-      const data = await getResponseData(response);
-      const error = new RequestError(toErrorMessage(data), status, {
-        response: {
-          url,
-          status,
-          headers,
-          data
-        },
-        request: requestOptions
-      });
-      throw error;
-    }
-    return parseSuccessResponseBody ? await getResponseData(response) : response.body;
-  }).then((data) => {
-    return {
-      status,
-      url,
-      headers,
-      data
-    };
-  }).catch((error) => {
-    if (error instanceof RequestError)
-      throw error;
-    else if (error.name === "AbortError")
-      throw error;
-    let message = error.message;
-    if (error.name === "TypeError" && "cause" in error) {
-      if (error.cause instanceof Error) {
-        message = error.cause.message;
-      } else if (typeof error.cause === "string") {
-        message = error.cause;
-      }
-    }
-    throw new RequestError(message, 500, {
-      request: requestOptions
-    });
-  });
-}
-async function getResponseData(response) {
-  const contentType = response.headers.get("content-type");
-  if (/application\/json/.test(contentType)) {
-    return response.json().catch(() => response.text()).catch(() => "");
-  }
-  if (!contentType || /^text\/|charset=utf-8$/.test(contentType)) {
-    return response.text();
-  }
-  return getBufferResponse(response);
-}
-function toErrorMessage(data) {
-  if (typeof data === "string")
-    return data;
-  let suffix;
-  if ("documentation_url" in data) {
-    suffix = ` - ${data.documentation_url}`;
-  } else {
-    suffix = "";
-  }
-  if ("message" in data) {
-    if (Array.isArray(data.errors)) {
-      return `${data.message}: ${data.errors.map(JSON.stringify).join(", ")}${suffix}`;
-    }
-    return `${data.message}${suffix}`;
-  }
-  return `Unknown error: ${JSON.stringify(data)}`;
-}
-
-// pkg/dist-src/with-defaults.js
-function dist_bundle_withDefaults(oldEndpoint, newDefaults) {
-  const endpoint2 = oldEndpoint.defaults(newDefaults);
-  const newApi = function(route, parameters) {
-    const endpointOptions = endpoint2.merge(route, parameters);
-    if (!endpointOptions.request || !endpointOptions.request.hook) {
-      return fetchWrapper(endpoint2.parse(endpointOptions));
-    }
-    const request2 = (route2, parameters2) => {
-      return fetchWrapper(
-        endpoint2.parse(endpoint2.merge(route2, parameters2))
-      );
-    };
-    Object.assign(request2, {
-      endpoint: endpoint2,
-      defaults: dist_bundle_withDefaults.bind(null, endpoint2)
-    });
-    return endpointOptions.request.hook(request2, endpointOptions);
-  };
-  return Object.assign(newApi, {
-    endpoint: endpoint2,
-    defaults: dist_bundle_withDefaults.bind(null, endpoint2)
-  });
-}
-
-// pkg/dist-src/index.js
-var request = dist_bundle_withDefaults(endpoint, {
-  headers: {
-    "user-agent": `octokit-request.js/${dist_bundle_VERSION} ${getUserAgent()}`
-  }
-});
-
-
-;// CONCATENATED MODULE: ./node_modules/@octokit/graphql/dist-bundle/index.js
-// pkg/dist-src/index.js
-
-
-
-// pkg/dist-src/version.js
-var graphql_dist_bundle_VERSION = "0.0.0-development";
-
-// pkg/dist-src/with-defaults.js
-
-
-// pkg/dist-src/graphql.js
-
-
-// pkg/dist-src/error.js
-function _buildMessageForResponseErrors(data) {
-  return `Request failed due to following response errors:
-` + data.errors.map((e) => ` - ${e.message}`).join("\n");
-}
-var GraphqlResponseError = class extends Error {
-  constructor(request2, headers, response) {
-    super(_buildMessageForResponseErrors(response));
-    this.request = request2;
-    this.headers = headers;
-    this.response = response;
-    this.errors = response.errors;
-    this.data = response.data;
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
-    }
-  }
-  name = "GraphqlResponseError";
-  errors;
-  data;
-};
-
-// pkg/dist-src/graphql.js
-var NON_VARIABLE_OPTIONS = [
-  "method",
-  "baseUrl",
-  "url",
-  "headers",
-  "request",
-  "query",
-  "mediaType"
-];
-var FORBIDDEN_VARIABLE_OPTIONS = ["query", "method", "url"];
-var GHES_V3_SUFFIX_REGEX = /\/api\/v3\/?$/;
-function graphql(request2, query, options) {
-  if (options) {
-    if (typeof query === "string" && "query" in options) {
-      return Promise.reject(
-        new Error(`[@octokit/graphql] "query" cannot be used as variable name`)
-      );
-    }
-    for (const key in options) {
-      if (!FORBIDDEN_VARIABLE_OPTIONS.includes(key))
-        continue;
-      return Promise.reject(
-        new Error(
-          `[@octokit/graphql] "${key}" cannot be used as variable name`
-        )
-      );
-    }
-  }
-  const parsedOptions = typeof query === "string" ? Object.assign({ query }, options) : query;
-  const requestOptions = Object.keys(
-    parsedOptions
-  ).reduce((result, key) => {
-    if (NON_VARIABLE_OPTIONS.includes(key)) {
-      result[key] = parsedOptions[key];
-      return result;
-    }
-    if (!result.variables) {
-      result.variables = {};
-    }
-    result.variables[key] = parsedOptions[key];
-    return result;
-  }, {});
-  const baseUrl = parsedOptions.baseUrl || request2.endpoint.DEFAULTS.baseUrl;
-  if (GHES_V3_SUFFIX_REGEX.test(baseUrl)) {
-    requestOptions.url = baseUrl.replace(GHES_V3_SUFFIX_REGEX, "/api/graphql");
-  }
-  return request2(requestOptions).then((response) => {
-    if (response.data.errors) {
-      const headers = {};
-      for (const key of Object.keys(response.headers)) {
-        headers[key] = response.headers[key];
-      }
-      throw new GraphqlResponseError(
-        requestOptions,
-        headers,
-        response.data
-      );
-    }
-    return response.data.data;
-  });
-}
-
-// pkg/dist-src/with-defaults.js
-function graphql_dist_bundle_withDefaults(request2, newDefaults) {
-  const newRequest = request2.defaults(newDefaults);
-  const newApi = (query, options) => {
-    return graphql(newRequest, query, options);
-  };
-  return Object.assign(newApi, {
-    defaults: graphql_dist_bundle_withDefaults.bind(null, newRequest),
-    endpoint: newRequest.endpoint
-  });
-}
-
-// pkg/dist-src/index.js
-var graphql2 = graphql_dist_bundle_withDefaults(request, {
-  headers: {
-    "user-agent": `octokit-graphql.js/${graphql_dist_bundle_VERSION} ${getUserAgent()}`
-  },
-  method: "POST",
-  url: "/graphql"
-});
-function withCustomRequest(customRequest) {
-  return graphql_dist_bundle_withDefaults(customRequest, {
-    method: "POST",
-    url: "/graphql"
-  });
-}
-
-
-
 /***/ })
 
 /******/ 	});
@@ -58113,45 +56893,82 @@ function withCustomRequest(customRequest) {
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__nccwpck_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__nccwpck_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(5763);
-/******/ 	module.exports = __webpack_exports__;
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+const fs = __nccwpck_require__(7147);
+const path = __nccwpck_require__(1017);
+const { Octokit } = __nccwpck_require__(4273);
+const archiver = __nccwpck_require__(2642);
+const xlsx = __nccwpck_require__(6725);
+const core = __nccwpck_require__(115);
+
+async function getAllRepos(org, token) {
+  const octokit = new Octokit({ auth: token });
+  const response = await octokit.repos.listForOrg({ org });
+  return response.data.map(repo => repo.name);
+}
+
+async function getSecretScanningAlerts(org, repo, token) {
+  const octokit = new Octokit({ auth: token });
+  const response = await octokit.paginate(octokit.rest.secretScanning.listAlertsForRepo, {
+    owner: org,
+    repo
+  });
+  return response.map(alert => [
+    alert.html_url || '',
+    alert.secret_type || '',
+    alert.secret || '',
+    alert.state || '',
+    alert.resolution || ''
+  ]);
+}
+
+async function generateExcel(data, repoName) {
+  const wb = xlsx.utils.book_new();
+  const ws = xlsx.utils.aoa_to_sheet(data);
+  xlsx.utils.book_append_sheet(wb, ws, 'secret-scanning-alerts');
+  const outputPath = path.join(__dirname, `${repoName}-alerts.xlsx`);
+  xlsx.writeFile(wb, outputPath);
+  return outputPath;
+}
+
+async function createZip(org, token) {
+  const repos = await getAllRepos(org, token);
+  const zipName = `${org}-secret-scanning-alerts.zip`;
+  const output = fs.createWriteStream(zipName);
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  archive.pipe(output);
+  
+  for (const repo of repos) {
+    const alerts = await getSecretScanningAlerts(org, repo, token);
+    const excelPath = await generateExcel(alerts, repo);
+    archive.file(excelPath, { name: `${repo}-alerts.xlsx` });
+    fs.unlinkSync(excelPath); // remove the generated Excel file after adding to zip
+  }
+
+  archive.finalize();
+}
+
+async function run() {
+  try {
+    const org = core.getInput('organization');
+    const token = core.getInput('token');
+    await createZip(org, token);
+  } catch (error) {
+    core.setFailed(error.message);
+  }
+}
+
+run();
+
+})();
+
+module.exports = __webpack_exports__;
 /******/ })()
 ;
