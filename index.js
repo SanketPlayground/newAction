@@ -3,6 +3,7 @@ const path = require('path');
 const archiver = require('archiver');
 const { Octokit } = require('@octokit/rest');
 const xlsx = require('xlsx');
+const core = require('@actions/core');
 
 async function getAllRepos(org, token) {
   const octokit = new Octokit({ auth: token });
@@ -12,8 +13,9 @@ async function getAllRepos(org, token) {
 
 async function getSecretScanningAlerts(org, repo, token) {
   const octokit = new Octokit({ auth: token });
-  const response = await octokit.paginate(octokit.rest.secretScanning.listAlertsForOrg, {
-    org
+  const response = await octokit.paginate(octokit.rest.secretScanning.listAlertsForRepo, {
+    owner: org,
+    repo
   });
   return response.map(alert => [
     alert.html_url || '',
@@ -24,11 +26,11 @@ async function getSecretScanningAlerts(org, repo, token) {
   ]);
 }
 
-async function generateExcel(data, org) {
+async function generateExcel(data, org, repo) {
   const wb = xlsx.utils.book_new();
   const ws = xlsx.utils.aoa_to_sheet(data);
-  xlsx.utils.book_append_sheet(wb, ws, `${org}-secret-scanning-alerts`);
-  const outputPath = path.join(__dirname, `${org}-alerts.xlsx`);
+  xlsx.utils.book_append_sheet(wb, ws, `${repo}-secret-scanning-alerts`);
+  const outputPath = path.join(__dirname, `${repo}-alerts.xlsx`);
   xlsx.writeFile(wb, outputPath);
   return outputPath;
 }
@@ -42,25 +44,26 @@ async function createZip(org, token) {
   
   for (const repo of repos) {
     const alerts = await getSecretScanningAlerts(org, repo, token);
-    const excelPath = await generateExcel(alerts, repo);
+    const excelPath = await generateExcel(alerts, org, repo);
     archive.file(excelPath, { name: `${repo}-alerts.xlsx` });
     fs.unlinkSync(excelPath); // remove the generated Excel file after adding to zip
   }
 
   archive.finalize();
+  return zipName;
 }
 
 async function run() {
   try {
-    const org = process.env.ORGANIZATION; // Get organization from environment variable
-    const token = process.env.TOKEN; // Get token from environment variable
+    const org = core.getInput('organization');
+    const token = core.getInput('token');
     if (!org || !token) {
       throw new Error('Organization or token is not provided.');
     }
-    await createZip(org, token);
+    const zipFilePath = await createZip(org, token);
+    core.setOutput('zip-file', zipFilePath);
   } catch (error) {
-    console.error(error);
-    process.exit(1);
+    core.setFailed(error.message);
   }
 }
 
