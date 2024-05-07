@@ -3,21 +3,18 @@ const path = require('path');
 const archiver = require('archiver');
 const xlsx = require('xlsx');
 const core = require('@actions/core');
+const axios = require('axios'); // Import Axios
 
 async function getAllRepos(org, token) {
     try {
       const url = `https://api.github.com/orgs/${org}/repos`;
-      const response = await fetch(url, {
+      const response = await axios.get(url, {
         headers: {
           Authorization: `token ${token}`
         }
       });
   
-      if (!response.ok) {
-        throw new Error(`Failed to fetch repositories: ${response.statusText}`);
-      }
-  
-      const data = await response.json();
+      const data = response.data;
       return data.map(repo => repo.name);
     } catch (error) {
       console.error('Error fetching repositories:', error);
@@ -25,32 +22,47 @@ async function getAllRepos(org, token) {
     }
   }
   
-  async function getSecretScanningAlerts(org, repo, token) {
+  async function getSecretScanningReport(octokit, login, repoName) {
+    const csvData = [];
+  
     try {
-      const url = `https://api.github.com/repos/${org}/${repo}/secret-scanning/alerts`;
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `token ${token}`
+      const secretScanningAlerts = await octokit.paginate(
+        octokit.rest.secretScanning.listAlertsForRepo,
+        {
+          owner: login,
+          repo: repoName
         }
-      });
+      );
   
-      if (!response.ok) {
-        throw new Error(`Failed to fetch secret scanning alerts: ${response.statusText}`);
+      const header = [
+        'html_url',
+        'secret_type',
+        'secret',
+        'state',
+        'resolution'
+      ];
+  
+      csvData.push(header);
+      for (const alert of secretScanningAlerts) {
+        const row = [
+          alert.html_url || '',
+          alert.secret_type || '',
+          alert.secret || '',
+          alert.state || '',
+          alert.resolution || ''
+        ];
+        csvData.push(row);
       }
-  
-      const data = await response.json();
-      return data.map(alert => [
-        alert.html_url || '',
-        alert.secret_type || '',
-        alert.secret || '',
-        alert.state || '',
-        alert.resolution || ''
-      ]);
+      return csvData;
     } catch (error) {
-      console.error('Error fetching secret scanning alerts:', error);
-      throw error;
+      if (error instanceof Error) {
+        core.error(error.message);
+        csvData.push([error.message, '', '', '', '']);
+      }
+      return csvData;
     }
   }
+  
   
 
 async function generateExcel(data, org, repo) {
@@ -70,7 +82,7 @@ async function createZip(org, token) {
   archive.pipe(output);
   
   for (const repo of repos) {
-    const alerts = await getSecretScanningAlerts(org, repo, token);
+    const alerts = await getSecretScanningReport(org, repo, token);
     const excelPath = await generateExcel(alerts, org, repo);
     archive.file(excelPath, { name: `${repo}-alerts.xlsx` });
     fs.unlinkSync(excelPath); // remove the generated Excel file after adding to zip
