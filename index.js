@@ -55,9 +55,6 @@ async function generateExcel(data, org, repo) {
 }
 
 
-
-
-
 async function createZip(org, token) {
     const repos = await getAllRepos(org, token);
     const zipName = `${org}-secret-scanning-alerts.zip`;
