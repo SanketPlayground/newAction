@@ -5,32 +5,53 @@ const xlsx = require('xlsx');
 const core = require('@actions/core');
 
 async function getAllRepos(org, token) {
-  const url = `https://api.github.com/orgs/${org}/repos`;
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `token ${token}`
+    try {
+      const url = `https://api.github.com/orgs/${org}/repos`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `token ${token}`
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch repositories: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      return data.map(repo => repo.name);
+    } catch (error) {
+      console.error('Error fetching repositories:', error);
+      throw error;
     }
-  });
-  const data = await response.json();
-  return data.map(repo => repo.name);
-}
-
-async function getSecretScanningAlerts(org, repo, token) {
-  const url = `https://api.github.com/repos/${org}/${repo}/secret-scanning/alerts`;
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `token ${token}`
+  }
+  
+  async function getSecretScanningAlerts(org, repo, token) {
+    try {
+      const url = `https://api.github.com/repos/${org}/${repo}/secret-scanning/alerts`;
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `token ${token}`
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch secret scanning alerts: ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      return data.map(alert => [
+        alert.html_url || '',
+        alert.secret_type || '',
+        alert.secret || '',
+        alert.state || '',
+        alert.resolution || ''
+      ]);
+    } catch (error) {
+      console.error('Error fetching secret scanning alerts:', error);
+      throw error;
     }
-  });
-  const data = await response.json();
-  return data.map(alert => [
-    alert.html_url || '',
-    alert.secret_type || '',
-    alert.secret || '',
-    alert.state || '',
-    alert.resolution || ''
-  ]);
-}
+  }
+  
 
 async function generateExcel(data, org, repo) {
   const wb = xlsx.utils.book_new();
