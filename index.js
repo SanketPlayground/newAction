@@ -45,7 +45,7 @@ async function run() {
         const repos = await getAllRepos(org, token);
         for (const repo of repos) {
             try {
-                // const alerts = await getSecretScanningAlerts(org, repo, token);
+                const alerts = await getSecretScanningAlerts(org, repo, token);
                 console.log(`Secret scanning alerts for ${repo}:`, "alerts");
             } catch (error) {
                 console.error('Failed to process repo:', repo, error);
