@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const archiver = require('archiver');
 const { Octokit } = require('@octokit/rest');
 const xlsx = require('xlsx');
 
@@ -11,9 +12,8 @@ async function getAllRepos(org, token) {
 
 async function getSecretScanningAlerts(org, repo, token) {
   const octokit = new Octokit({ auth: token });
-  const response = await octokit.paginate(octokit.rest.secretScanning.listAlertsForRepo, {
-    owner: org,
-    repo
+  const response = await octokit.paginate(octokit.rest.secretScanning.listAlertsForOrg, {
+    org
   });
   return response.map(alert => [
     alert.html_url || '',
@@ -24,11 +24,11 @@ async function getSecretScanningAlerts(org, repo, token) {
   ]);
 }
 
-async function generateExcel(data, repoName) {
+async function generateExcel(data, org) {
   const wb = xlsx.utils.book_new();
   const ws = xlsx.utils.aoa_to_sheet(data);
-  xlsx.utils.book_append_sheet(wb, ws, 'secret-scanning-alerts');
-  const outputPath = path.join(__dirname, `${repoName}-alerts.xlsx`);
+  xlsx.utils.book_append_sheet(wb, ws, `${org}-secret-scanning-alerts`);
+  const outputPath = path.join(__dirname, `${org}-alerts.xlsx`);
   xlsx.writeFile(wb, outputPath);
   return outputPath;
 }
