@@ -14,6 +14,7 @@
     "@actions/github": "^6.0.0",
     "@octokit/graphql": "^8.1.1",
     "@octokit/rest": "^20.1.1",
+    "archiver": "^7.0.1",
     "axios": "^1.6.8",
     "node-fetch": "^3.3.2",
     "quick-pivot": "^2.7.0",
