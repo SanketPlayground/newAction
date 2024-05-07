@@ -1,9 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { Octokit } = require('@octokit/rest');
-const archiver = require('archiver');
 const xlsx = require('xlsx');
-const core = require('@actions/core');
 
 async function getAllRepos(org, token) {
   const octokit = new Octokit({ auth: token });
@@ -54,11 +52,15 @@ async function createZip(org, token) {
 
 async function run() {
   try {
-    const org = core.getInput('organization');
-    const token = core.getInput('token');
+    const org = process.env.ORGANIZATION; // Get organization from environment variable
+    const token = process.env.TOKEN; // Get token from environment variable
+    if (!org || !token) {
+      throw new Error('Organization or token is not provided.');
+    }
     await createZip(org, token);
   } catch (error) {
-    core.setFailed(error.message);
+    console.error(error);
+    process.exit(1);
   }
 }
 
