@@ -49,10 +49,11 @@ async function generateExcel(data, org, repo) {
     const ws = xlsx.utils.aoa_to_sheet(data);
     const sheetName = `${repo.substring(0, 30)}-secret-scanning-alerts`;
     xlsx.utils.book_append_sheet(wb, ws, sheetName);
-    const outputPath = path.join(__dirname, `${repo}-alerts.xlsx`);
+    const outputPath = path.join(__dirname, 'output', `${repo}-alerts.xlsx`); // Specify output directory
     xlsx.writeFile(wb, outputPath);
     return outputPath;
 }
+
 
 async function createZip(org, token) {
     const repos = await getAllRepos(org, token);
