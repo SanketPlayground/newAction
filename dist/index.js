@@ -37616,6 +37616,21 @@ async function getAllRepos(org, token) {
     }
 }
 
+async function getSecretScanningAlerts(owner, repo, token) {
+    const octokit = new Octokit({ auth: token });
+
+    try {
+        const alerts = await octokit.rest.secretScanning.listAlertsForRepo({
+            owner: owner,
+            repo: repo
+        });
+        return alerts.data.alerts;
+    } catch (error) {
+        console.error(`Failed to retrieve secret scanning alerts for ${owner}/${repo}:`, error);
+        return [];
+    }
+}
+
 async function run() {
     try {
         const csvFilePath = 'copilot.txt'; // Directory for artifacts
@@ -37632,8 +37647,9 @@ async function run() {
         const repos = await getAllRepos(org, token);
         for (const repo of repos) {
             try {
+                const alerts = await getSecretScanningAlerts(org, repo, token);
                 console.log(`Secret scanning alerts for ${org}/${repo}:`, "alerts");
-                appendToCSV(` ${org}/${repo} \n`, "copilot.txt");
+                appendToCSV(` ${org}/${repo}: ${alerts} \n`, "copilot.txt");
             } catch (error) {
                 console.error('Failed to process repo:', repo, error);
             }
