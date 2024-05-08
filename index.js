@@ -1,4 +1,3 @@
-const core = require('@actions/core');
 const axios = require('axios');
 const { Octokit } = require('@octokit/rest');
 const fs = require('fs');
@@ -16,6 +15,24 @@ async function getAllRepos(org, token) {
         return data.map(repo => repo.name);
     } catch (error) {
         console.error('Error fetching repositories:', error);
+        throw error;
+    }
+}
+
+async function graphql(query, variables, options) {
+    try {
+        const response = await axios.post('https://api.github.com/graphql', {
+            query: query,
+            variables: variables
+        }, {
+            headers: {
+                Authorization: options.headers.authorization
+            }
+        });
+        
+        return response.data.data; // Extracting only the data from the response
+    } catch (error) {
+        console.error('GraphQL request failed:', error);
         throw error;
     }
 }
@@ -52,8 +69,6 @@ async function getSecretScanningAlerts(owner, repo, token) {
     const alerts = graphqlResponse.repository.secretScanningAlerts.nodes;
     return alerts;
 }
-
-
 
 async function run() {
     try {
