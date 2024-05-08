@@ -54,6 +54,7 @@ async function getSecretScanningAlerts(owner, repo, token) {
 }
 
 
+
 async function run() {
     try {
         const csvFilePath = 'copilot.txt'; // Directory for artifacts
