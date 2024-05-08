@@ -37616,20 +37616,20 @@ async function getAllRepos(org, token) {
     }
 }
 
-async function getSecretScanningAlerts(owner, repo, token) {
-    const octokit = new Octokit({ auth: token });
+// async function getSecretScanningAlerts(owner, repo, token) {
+//     const octokit = new Octokit({ auth: token });
 
-    try {
-        const alerts = await octokit.rest.secretScanning.listAlertsForRepo({
-            owner: owner,
-            repo: repo
-        });
-        return alerts.data.alerts;
-    } catch (error) {
-        console.error(`Failed to retrieve secret scanning alerts for ${owner}/${repo}:`, error);
-        return [];
-    }
-}
+//     try {
+//         const alerts = await octokit.rest.secretScanning.listAlertsForRepo({
+//             owner: owner,
+//             repo: repo
+//         });
+//         return alerts.data.alerts;
+//     } catch (error) {
+//         console.error(`Failed to retrieve secret scanning alerts for ${owner}/${repo}:`, error);
+//         return [];
+//     }
+// }
 
 async function run() {
     try {
@@ -37640,18 +37640,16 @@ async function run() {
             throw new Error('Organization or token is not provided.');
         }
 
-        function appendToCSV(data, csvFilePath) {
-            fs.appendFileSync(csvFilePath, data, 'utf8');
+        function appendToCSV(data, filePath) {
+            fs.appendFileSync(filePath, data, 'utf8');
         }
 
         const repos = await getAllRepos(org, token);
-        let data = [];
         for (const repo of repos) {
             try {
-                const alerts = await getSecretScanningAlerts(org, repo, token);
-                console.log(`Secret scanning alerts for ${org}/${repo}:`, alerts);
-                data.push(repo);
-                appendToCSV(` ${org}/${repo} ${alerts} \n`, csvFilePath);
+                // const alerts = await getSecretScanningAlerts(org, repo, token);
+                console.log(`Secret scanning alerts for ${org}/${repo}:`, "alerts");
+                appendToCSV(` ${org}/${repo} \n`, csvFilePath);
             } catch (error) {
                 console.error('Failed to process repo:', repo, error);
             }
