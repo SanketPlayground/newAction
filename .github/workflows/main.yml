@@ -26,10 +26,10 @@ jobs:
         uses: actions/upload-artifact@v3.0.0
         with:
           name: generated-alerts
-          path: ${{ github.workspace }}/*.csv
+          path: ${{ github.workspace }}/*.txt
           if-no-files-found: error
       - name: Upload artifact
         uses: actions/download-artifact@v4
         with:
           name: generated-alerts
-          path: ${{ github.workspace }}/*.csv
+          path: ${{ github.workspace }}/*.txt
