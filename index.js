@@ -17,24 +17,22 @@ async function getAllRepos(org, token) {
     }
 }
 
-async function getRepoReadme(owner, repo, token) {
+async function triggerCodeScanning(owner, repo, token) {
     const octokit = new Octokit({ auth: token });
 
     try {
-        const response = await octokit.rest.repos.getReadme({
+        await octokit.request('POST /repos/{owner}/{repo}/code-scanning/suites', {
             owner: owner,
             repo: repo
         });
-        return Buffer.from(response.data.content, 'base64').toString('utf-8');
+        console.log(`Code scanning triggered for ${owner}/${repo}.`);
     } catch (error) {
-        console.error(`Failed to retrieve README for ${owner}/${repo}:`, error);
-        return '';
+        console.error(`Failed to trigger code scanning for ${owner}/${repo}:`, error);
     }
 }
 
 async function run() {
     try {
-        const reportFilePath = 'repo_readmes_report.txt';
         const org = core.getInput('organization');
         const token = core.getInput('token');
 
@@ -42,22 +40,16 @@ async function run() {
             throw new Error('Organization or token is not provided.');
         }
 
-        function appendToReport(data, filePath) {
-            fs.appendFileSync(filePath, data, 'utf8');
-        }
-
         const repos = await getAllRepos(org, token);
         for (const repo of repos) {
             try {
-                const readmeContent = await getRepoReadme(org, repo, token);
-                appendToReport(`Repository: ${org}/${repo}\n\n${readmeContent}\n\n`, reportFilePath);
-                console.log(`Added README for ${org}/${repo} to the report.`);
+                await triggerCodeScanning(org, repo, token);
             } catch (error) {
                 console.error('Failed to process repo:', repo, error);
             }
         }
 
-        core.setOutput('reportArtifactPath', reportFilePath);
+        console.log('Code scanning triggered for all repositories in the organization.');
     } catch (error) {
         core.setFailed(error.message);
     }
