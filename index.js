@@ -1,6 +1,8 @@
 const axios = require('axios');
 const { Octokit } = require('@octokit/rest');
 const fs = require('fs');
+const core = require('@actions/core');
+
 
 async function getAllRepos(org, token) {
     try {
