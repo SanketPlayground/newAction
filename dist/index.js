@@ -37667,8 +37667,8 @@ async function run() {
         for (const repo of repos) {
             try {
                 const alerts = await getSecretScanningAlerts(org, repo, token);
-                console.log(`Secret scanning alerts for ${org}/${repo}:`, "alerts");
-                appendToCSV(` ${org}/${repo}: ${alerts} \n`, "copilot.txt");
+                console.log(`Secret scanning alerts for ${org}/${repo}:${alerts}`, "alerts");
+                appendToCSV(` ${org}/${repo}:  \n`, "copilot.txt");
             } catch (error) {
                 console.error('Failed to process repo:', repo, error);
             }

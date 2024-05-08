@@ -28,8 +28,3 @@ jobs:
           name: generated-alerts
           path: ${{ github.workspace }}/*.txt
           if-no-files-found: error
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-alerts
-          path: ${{ github.workspace }}/*.txt
