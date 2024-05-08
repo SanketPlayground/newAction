@@ -1,118 +1,63 @@
-const axios = require('axios');
 const { Octokit } = require('@octokit/rest');
 const fs = require('fs');
 const core = require('@actions/core');
 
-
 async function getAllRepos(org, token) {
-    try {
-        const url = `https://api.github.com/orgs/${org}/repos`;
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `token ${token}`
-            }
-        });
+    const octokit = new Octokit({ auth: token });
 
-        const data = response.data;
-        return data.map(repo => repo.name);
+    try {
+        const response = await octokit.rest.repos.listForOrg({
+            org: org,
+            per_page: 100 // Increase if you have more than 100 repos
+        });
+        return response.data.map(repo => repo.name);
     } catch (error) {
         console.error('Error fetching repositories:', error);
         throw error;
     }
 }
 
-async function graphql(query, variables, options) {
-    try {
-        const response = await axios.post('https://api.github.com/graphql', {
-            query: query,
-            variables: variables
-        }, {
-            headers: {
-                Authorization: options.headers.authorization
-            }
-        });
-        
-        return response.data.alerts; // Extracting only the data from the response
-    } catch (error) {
-        console.error('GraphQL request failed:', error);
-        throw error;
-    }
-}
-
-// async function getSecretScanningAlerts(owner, repo, token) {
-//     const query = `
-//         query GetSecretScanningAlerts($owner: String!, $repo: String!) {
-//             repository(owner: $owner, name: $repo) {
-//                 secretScanningAlerts(first: 100) {
-//                     nodes {
-//                         createdAt
-//                         dismissedAt
-//                         state
-//                         secretType
-//                         secret
-//                         resolution
-//                     }
-//                 }
-//             }
-//         }
-//     `;
-
-//     const variables = {
-//         owner: owner,
-//         repo: repo
-//     };
-
-//     const graphqlResponse = await graphql(query, variables, {
-//         headers: {
-//             authorization: `token ${token}`
-//         }
-//     });
-
-//     const alerts = graphqlResponse.repository.secretScanningAlerts.nodes;
-//     return alerts;
-// }
-
-async function getSecretScanningAlerts(owner, repo, token) {
+async function getRepoReadme(owner, repo, token) {
     const octokit = new Octokit({ auth: token });
 
     try {
-        const response = await octokit.rest.secretScanning.listAlertsForRepo({
+        const response = await octokit.rest.repos.getReadme({
             owner: owner,
             repo: repo
         });
-        
-        return response.data.alerts;
+        return Buffer.from(response.data.content, 'base64').toString('utf-8');
     } catch (error) {
-        console.error(`Failed to retrieve secret scanning alerts for ${owner}/${repo}:`, error);
-        return [];
+        console.error(`Failed to retrieve README for ${owner}/${repo}:`, error);
+        return '';
     }
 }
 
 async function run() {
     try {
-        const csvFilePath = 'copilot.txt'; // Directory for artifacts
+        const reportFilePath = 'repo_readmes_report.txt';
         const org = core.getInput('organization');
         const token = core.getInput('token');
+
         if (!org || !token) {
             throw new Error('Organization or token is not provided.');
         }
 
-        function appendToCSV(data, filePath) {
+        function appendToReport(data, filePath) {
             fs.appendFileSync(filePath, data, 'utf8');
         }
 
         const repos = await getAllRepos(org, token);
         for (const repo of repos) {
             try {
-                const alerts = await getSecretScanningAlerts(org, repo, token);
-                console.log(`Secret scanning alerts for ${org}/${repo}:${alerts}`, "alerts");
-                appendToCSV(` ${org}/${repo}:  \n`, "copilot.txt");
+                const readmeContent = await getRepoReadme(org, repo, token);
+                appendToReport(`Repository: ${org}/${repo}\n\n${readmeContent}\n\n`, reportFilePath);
+                console.log(`Added README for ${org}/${repo} to the report.`);
             } catch (error) {
                 console.error('Failed to process repo:', repo, error);
             }
         }
-        
-        core.setOutput('csvArtifactPath', "copilot.txt"); // Set artifact output
+
+        core.setOutput('reportArtifactPath', reportFilePath);
     } catch (error) {
         core.setFailed(error.message);
     }
