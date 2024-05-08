@@ -38423,6 +38423,10 @@ async function run() {
             throw new Error('Organization or token is not provided.');
         }
 
+        function appendToCSV(data, filePath) {
+            fs.appendFileSync(filePath, data, 'utf8');
+        }
+        
         const repos = await getAllRepos(org, token);
         for (const repo of repos) {
             try {
