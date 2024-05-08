@@ -38,7 +38,6 @@ async function run() {
             try {
                 console.log(`Secret scanning alerts for ${org}/${repo}:`, "alerts");
                 appendToCSV(` ${org}/${repo} \n`, "copilot.txt");
-                appendToCSV(" ${org}/${repo}", "copilot.txt");
             } catch (error) {
                 console.error('Failed to process repo:', repo, error);
             }
