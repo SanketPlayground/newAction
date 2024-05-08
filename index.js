@@ -21,19 +21,38 @@ async function getAllRepos(org, token) {
 }
 
 async function getSecretScanningAlerts(owner, repo, token) {
-    const octokit = new Octokit({ auth: token });
+    const query = `
+        query GetSecretScanningAlerts($owner: String!, $repo: String!) {
+            repository(owner: $owner, name: $repo) {
+                secretScanningAlerts(first: 100) {
+                    nodes {
+                        createdAt
+                        dismissedAt
+                        state
+                        secretType
+                        secret
+                        resolution
+                    }
+                }
+            }
+        }
+    `;
 
-    try {
-        const alerts = await octokit.rest.secretScanning.listAlertsForRepo({
-            owner: owner,
-            repo: repo
-        });
-        return alerts.data.alerts;
-    } catch (error) {
-        console.error(`Failed to retrieve secret scanning alerts for ${owner}/${repo}:`, error);
-        return [];
-    }
+    const variables = {
+        owner: owner,
+        repo: repo
+    };
+
+    const graphqlResponse = await graphql(query, variables, {
+        headers: {
+            authorization: `token ${token}`
+        }
+    });
+
+    const alerts = graphqlResponse.repository.secretScanningAlerts.nodes;
+    return alerts;
 }
+
 
 async function run() {
     try {
