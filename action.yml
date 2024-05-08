@@ -13,6 +13,8 @@ inputs:
 outputs:
   time: # id of output
     description: 'The time we greeted you'
+  csvArtifactPath:
+    description: 'Path to the generated CSV artifact'
 runs:
   using: 'node20'
   main: 'dist/index.js'

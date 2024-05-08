@@ -31,4 +31,5 @@ jobs:
         uses: actions/upload-artifact@v3.0.0
         with:
           name: generated-alerts
-          path: path/to/artifact/content/
+          path: ${{ github.workspace }}/*.csv
+          if-no-files-found: error
