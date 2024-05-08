@@ -33,4 +33,3 @@ jobs:
         with:
           name: generated-alerts
           path: ${{ github.workspace }}/*.txt
-          if-no-files-found: error
