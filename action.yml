@@ -3,7 +3,7 @@ description: 'Greet someone and record the time'
 inputs:
   who-to-greet:  # id of input
     description: 'Who to greet'
-    required: true
+    required: false
     default: 'World'
   organization:
     required: true
@@ -11,8 +11,6 @@ inputs:
   token:
     required: true 
 outputs:
-  time: # id of output
-    description: 'The time we greeted you'
   csvArtifactPath:
     description: 'Path to the generated CSV artifact'
 runs:

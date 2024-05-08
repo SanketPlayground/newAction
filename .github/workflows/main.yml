@@ -20,11 +20,6 @@ jobs:
       # Use the output from the `hello` step
       - name: Get the output time
         run: echo "The time was ${{ steps.hello.outputs.time }}"
-      - name: Generate Excel
-        id: generate-excel
-        run: |
-          node -e "require('./path/to/your/index.js').generateExcel()"
-        continue-on-error: true # Allow workflow to continue even if this step fails
       
       
       - name: Upload artifact
