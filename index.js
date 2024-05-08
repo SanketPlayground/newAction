@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const axios = require('axios');
 const { Octokit } = require('@octokit/rest');
-const { graphql } = require('@octokit/graphql');
+const fs = require('fs');
 
 async function getAllRepos(org, token) {
     try {
@@ -35,10 +35,9 @@ async function getSecretScanningAlerts(owner, repo, token) {
     }
 }
 
-
 async function run() {
     try {
-        const csvFilePath = 'copilot.csv';
+        const csvFilePath = 'artifacts/copilot.csv'; // Directory for artifacts
         const org = core.getInput('organization');
         const token = core.getInput('token');
         if (!org || !token) {
@@ -48,18 +47,19 @@ async function run() {
         function appendToCSV(data, filePath) {
             fs.appendFileSync(filePath, data, 'utf8');
         }
-        
+
         const repos = await getAllRepos(org, token);
         for (const repo of repos) {
             try {
                 const alerts = await getSecretScanningAlerts(org, repo, token);
                 console.log(`Secret scanning alerts for ${org}/${repo}:`, alerts);
                 appendToCSV(` ${org}/${repo} ${alerts} \n`, csvFilePath);
-                core.setOutput('csvArtifactPath', csvFilePath);
             } catch (error) {
                 console.error('Failed to process repo:', repo, error);
             }
         }
+        
+        core.setOutput('csvArtifactPath', csvFilePath); // Set artifact output
     } catch (error) {
         core.setFailed(error.message);
     }
