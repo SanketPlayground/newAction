@@ -32,7 +32,7 @@ async function graphql(query, variables, options) {
             }
         });
         
-        return response.data.data; // Extracting only the data from the response
+        return response.data.alerts; // Extracting only the data from the response
     } catch (error) {
         console.error('GraphQL request failed:', error);
         throw error;
