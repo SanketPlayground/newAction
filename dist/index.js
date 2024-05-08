@@ -37633,22 +37633,24 @@ async function getSecretScanningAlerts(owner, repo, token) {
 
 async function run() {
     try {
-        const csvFilePath = 'artifacts/copilot.csv'; // Directory for artifacts
+        const csvFilePath = 'copilot.txt'; // Directory for artifacts
         const org = core.getInput('organization');
         const token = core.getInput('token');
         if (!org || !token) {
             throw new Error('Organization or token is not provided.');
         }
 
-        function appendToCSV(data, filePath) {
-            fs.appendFileSync(filePath, data, 'utf8');
+        function appendToCSV(data, csvFilePath) {
+            fs.appendFileSync(csvFilePath, data, 'utf8');
         }
 
         const repos = await getAllRepos(org, token);
+        let data = [];
         for (const repo of repos) {
             try {
                 const alerts = await getSecretScanningAlerts(org, repo, token);
                 console.log(`Secret scanning alerts for ${org}/${repo}:`, alerts);
+                data.push(repo);
                 appendToCSV(` ${org}/${repo} ${alerts} \n`, csvFilePath);
             } catch (error) {
                 console.error('Failed to process repo:', repo, error);
